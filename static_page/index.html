@@ -1,0 +1,245 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>이름여기에</title>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<style>
+		html, body {
+			padding: 0;
+			margin: 0;
+			width: 100%;
+			height: 100%;
+		}
+	</style>
+</head>
+<body>
+	<nav class="navbar navbar-expand-md bg-dark navbar-dark">
+	  <a class="navbar-brand" href="#">Navbar</a>
+	  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+	    <span class="navbar-toggler-icon"></span>
+	  </button>
+	  <div class="collapse navbar-collapse" id="collapsibleNavbar">
+	    <ul class="navbar-nav">
+	      <li class="nav-item">
+	        <a class="nav-link" href="#">Link</a>
+	      </li>
+	      <li class="nav-item">
+	        <a class="nav-link" href="#">Link</a>
+	      </li>
+	      <li class="nav-item">
+	        <a class="nav-link" href="#">Link</a>
+	      </li>
+	    </ul>
+	  </div>
+	</nav>
+
+	<div id="map" style="width:100%; height: calc(100% - 56px);"></div>
+	<div class="modal fade" id="myModal">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">새로운 마커 추가</h4>
+          <button type="button" class="close" data-dismiss="modal">×</button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+          <div class="form-group">
+						<div class="custom-file mb-3">
+							<label class="custom-file-label" for="img-file">발견한 사진을 추가해주세요</label>
+							<input type="file" class="custom-file-input" id="img-file" name="filename">
+						</div>
+
+						<label for="comment">추가 설명</label>
+  					<textarea class="form-control" rows="5" id="comment"></textarea>
+
+						<label for="marker-type">마커 유형</label>
+					  <select class="form-control" id="marker-type">
+					    <option value='finding'>분실</option>
+					    <option value='found'>발견</option>
+					  </select>
+						<script>
+							$(".custom-file-input").on("change", function() {
+							  var fileName = $(this).val().split("\\").pop();
+							  $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+							});
+						</script>
+          </div>
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+					<button type="button" class="btn btn-info" data-dismiss="modal" onclick="addNewMarker()">추가</button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal">닫기</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+	<!-- To use data from anywehre -->
+	<input type="hidden" id="mouseLat" value=""/>
+	<input type="hidden" id="mouseLng" value=""/>
+
+	<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=dd7cc743403ed91289c131f3f48d89be"></script>
+	<script>
+
+		// Start of creating a map
+		var options = {
+			center: new kakao.maps.LatLng(37.577727, 127.071371),
+			level: 2
+		}
+		var container = document.getElementById('map');
+		var map = new kakao.maps.Map(container, options);
+
+		if (navigator.geolocation) {
+			//Move center of the map when geolocation can get a location.
+		 	// GeoLocation을 이용해서 접속 위치를 얻어옵니다
+	    navigator.geolocation.getCurrentPosition(function(position) {
+
+        var lat = position.coords.latitude // 위도
+        var lng = position.coords.longitude // 경도
+				var center = new kakao.maps.LatLng(lat, lng)
+				map.setCenter(center)
+      })
+		}
+		// End of creating a map
+
+
+		function drawMarker(lat, lng, type) {
+			var findingImage = 'https://lulrudev.s3.ap-northeast-2.amazonaws.com/img/finding.png'
+			var foundImage = 'https://lulrudev.s3.ap-northeast-2.amazonaws.com/img/found.png'
+	    var imageSize = new kakao.maps.Size(45, 45)
+	    var imageOption = {offset: new kakao.maps.Point(22, 44)}
+
+			var position = new kakao.maps.LatLng(lat, lng)
+
+			if(type === 'found') {
+				var foundMarkerImage = new kakao.maps.MarkerImage(foundImage, imageSize, imageOption)
+
+				var marker = new kakao.maps.Marker({
+					map: map,
+					position: position,
+					image: foundMarkerImage
+				})
+				//return marker
+			} else if(type === 'finding') {
+				var findingMarkerImage = new kakao.maps.MarkerImage(findingImage, imageSize, imageOption)
+
+				var marker = new kakao.maps.Marker({
+					map: map,
+					position: position,
+					image: findingMarkerImage
+				})
+				//return marker
+			} else {
+				alert("Failed to draw marker.")
+				//return false
+			}
+
+			// return marker or false when failed
+			res = marker ? marker : false
+			return res
+		}
+
+		// Start of loading markers from server.
+		var found = [], finding = []
+		fetch('http://backendapi.paas-ta.org/marker')
+		.then(res => res.json())
+		.then(data => {
+			finding = data.filter(function(d) {
+				return d.type == 'finding'
+			})
+			found = data.filter(function(d) {
+				return d.type == 'found'
+			})
+
+			for (var i = 0; i < finding.length; i++) {
+				var marker_info = finding[i]
+				var lat = parseFloat(marker_info.latitude)
+				var lng = parseFloat(marker_info.longitude)
+				var type = marker_info.type
+				drawMarker(lat, lng, type)
+			}
+
+
+			for (var i = 0; i < found.length; i++) {
+				var marker_info = found[i]
+				var lat = parseFloat(marker_info.latitude)
+				var lng = parseFloat(marker_info.longitude)
+				var type = marker_info.type
+				drawMarker(lat, lng, type)
+			}
+		})
+
+		function encodeFormData(data) {
+	    return Object.keys(data)
+	        .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(data[key]))
+	        .join('&');
+		}
+
+		//Event Lister when the map is clicked.
+		kakao.maps.event.addListener(map, 'click', function(mouseEvent) {
+			var latlng = mouseEvent.latLng
+			$('#mouseLat').val(latlng.getLat())
+			$('#mouseLng').val(latlng.getLng())
+	    $('#myModal').modal()
+			//drawMarker(latlng.getLat(), latlng.getLng(), 'found')
+		})
+
+		function addNewMarker() {
+			var lat = $('#mouseLat').val()
+			var lng = $('#mouseLng').val()
+			var type = $('#marker-type option:selected').val()
+			var comment = $('#comment').val()
+
+			var params = {
+				latitude: lat,
+				longitude: lng,
+				type: type,
+				img_url: "not impremented",
+				comment: comment
+			}
+
+			fetch('http://backendapi.paas-ta.org/marker', {
+			  method: 'POST',
+				headers: {
+        	'Accept': 'application/json',
+         	'Content-Type': 'application/json',
+        },
+				//mode: 'no-cors',
+				body: JSON.stringify(params)
+			})
+			.then(res => res.json())
+			.then(data => {
+				if(data.res == 'SUCCESS') {
+					var lat = data.latitude
+					var lng = data.longitude
+					var type = data.type
+					drawMarker(lat, lng, type)
+					return true
+				} else {
+					return false
+				}
+			})
+
+			// reset all input data in Modal
+			$('#comment').val('')
+			$('#img-file').val('')
+			$('.custom-file-label').addClass("selected").html('발견한 사진을 추가해주세요')
+			$('#marker-type').val('finding')
+			$('#mouseLat').val('')
+			$('#mouseLng').val('')
+		}
+
+	</script>
+
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+
+</body>
+</html>
