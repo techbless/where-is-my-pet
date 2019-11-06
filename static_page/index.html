@@ -3,7 +3,7 @@
 <head>
 	<meta charset="utf-8"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-	<title>이름여기에</title>
+	<title>라온[LAON]</title>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	<style>
@@ -17,7 +17,7 @@
 </head>
 <body>
 	<nav class="navbar navbar-expand-md bg-dark navbar-dark">
-	  <a class="navbar-brand" href="#">Navbar</a>
+	  <a class="navbar-brand" href="#">라온[LAON]</a>
 	  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
 	    <span class="navbar-toggler-icon"></span>
 	  </button>
@@ -60,8 +60,8 @@
 
 						<label for="marker-type">마커 유형</label>
 					  <select class="form-control" id="marker-type">
-					    <option value='finding'>분실</option>
-					    <option value='found'>발견</option>
+					    <option value='finding'>제 강아지좀 찾아주세요..😢</option>
+					    <option value='found'>강아지를 찾았어요.!😊</option>
 					  </select>
 						<script>
 							$(".custom-file-input").on("change", function() {
@@ -91,8 +91,8 @@
 
 		// Start of creating a map
 		var options = {
-			center: new kakao.maps.LatLng(37.577727, 127.071371),
-			level: 2
+			center: new kakao.maps.LatLng(37.541272, 126.989387),
+			level: 8
 		}
 		var container = document.getElementById('map');
 		var map = new kakao.maps.Map(container, options);
@@ -106,6 +106,7 @@
         var lng = position.coords.longitude // 경도
 				var center = new kakao.maps.LatLng(lat, lng)
 				map.setCenter(center)
+				map.setLevel(4)
       })
 		}
 		// End of creating a map
