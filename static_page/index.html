@@ -16,19 +16,17 @@
 		.info-overlay {
 			background-color: white;
 			width: 330px;
-			height: 450px;
+			height: 380px;
 			padding: 0px;
 			position: absolute;
 			left: -165px;
 			bottom: 50px;
 			border-radius: 10px;
 		}
-		.ol-header {
-			height: 60px;
+		.info-bg {
 			width: 100%;
-			margin: 0;
-			padding: 0;
-			background-color: #D3D3D3;
+			height: 200px;
+			background-size: 100% 100%;
 			border-radius: 10px 10px 0px 0px;
 		}
 	</style>
@@ -136,14 +134,14 @@
 			overlays.forEach(ol => ol.setMap(null))
 		}
 
-		function drawMarker(lat, lng, type) {
+		function drawMarker(info) {
 			var findingImage = 'https://lulrudev.s3.ap-northeast-2.amazonaws.com/img/finding.png'
 			var foundImage = 'https://lulrudev.s3.ap-northeast-2.amazonaws.com/img/found.png'
 	    var imageSize = new kakao.maps.Size(45, 45)
 	    var imageOption = {offset: new kakao.maps.Point(22, 44)}
-			var position = new kakao.maps.LatLng(lat, lng)
+			var position = new kakao.maps.LatLng(info.latitude, info.longitude)
 
-			if(type === 'found') {
+			if(info.type === 'found') {
 				var foundMarkerImage = new kakao.maps.MarkerImage(foundImage, imageSize, imageOption)
 
 				var marker = new kakao.maps.Marker({
@@ -152,7 +150,7 @@
 					image: foundMarkerImage
 				})
 				//return marker
-			} else if(type === 'finding') {
+			} else if(info.type === 'finding') {
 				var findingMarkerImage = new kakao.maps.MarkerImage(findingImage, imageSize, imageOption)
 
 				var marker = new kakao.maps.Marker({
@@ -165,13 +163,18 @@
 				alert("Failed to draw marker.")
 				//return false
 			}
+
 			var content = `
 				<div class='info-overlay'>
-					<div class="ol-header">
-						<div style="position: absolute; right: 20px; top: 20px">
-							<button type="button" class="close" onclick="closeOverlays()">×</button>
-						</div>
+					<div style="position: absolute; right: 12px; top: 8px">
+						<button type="button" class="close" onclick="closeOverlays()">
+							<p style="color: salmon">x</p>
+						</button>
 					</div>
+					<div class="info-bg" style="background-image: url('${info.img_url}')">
+						잃어버렸어요..ㅠ
+					</div>
+					<!--<img class="info-img" src="${info.img_url}" style="width: 100%; overflow: hidden;" alt="발견 당시 사진" />-->
 					<p>Informations will be here.</p>
 				</div>
 			`
@@ -207,19 +210,13 @@
 
 			for (var i = 0; i < finding.length; i++) {
 				var marker_info = finding[i]
-				var lat = parseFloat(marker_info.latitude)
-				var lng = parseFloat(marker_info.longitude)
-				var type = marker_info.type
-				drawMarker(lat, lng, type)
+				drawMarker(marker_info)
 			}
 
 
 			for (var i = 0; i < found.length; i++) {
 				var marker_info = found[i]
-				var lat = parseFloat(marker_info.latitude)
-				var lng = parseFloat(marker_info.longitude)
-				var type = marker_info.type
-				drawMarker(lat, lng, type)
+				drawMarker(marker_info)
 			}
 		})
 
@@ -262,10 +259,7 @@
 			.then(res => res.json())
 			.then(data => {
 				if(data.res == 'SUCCESS') {
-					var lat = data.latitude
-					var lng = data.longitude
-					var type = data.type
-					drawMarker(lat, lng, type)
+					drawMarker(data)
 					return true
 				} else {
 					return false
