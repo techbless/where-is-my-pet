@@ -13,6 +13,24 @@
 			width: 100%;
 			height: 100%;
 		}
+		.info-overlay {
+			background-color: white;
+			width: 330px;
+			height: 450px;
+			padding: 0px;
+			position: absolute;
+			left: -165px;
+			bottom: 50px;
+			border-radius: 10px;
+		}
+		.ol-header {
+			height: 60px;
+			width: 100%;
+			margin: 0;
+			padding: 0;
+			background-color: #D3D3D3;
+			border-radius: 10px 10px 0px 0px;
+		}
 	</style>
 </head>
 <body>
@@ -112,12 +130,17 @@
 		// End of creating a map
 
 
+		var overlays = []
+		function closeOverlays() {
+			//overlay.setMap(null)
+			overlays.forEach(ol => ol.setMap(null))
+		}
+
 		function drawMarker(lat, lng, type) {
 			var findingImage = 'https://lulrudev.s3.ap-northeast-2.amazonaws.com/img/finding.png'
 			var foundImage = 'https://lulrudev.s3.ap-northeast-2.amazonaws.com/img/found.png'
 	    var imageSize = new kakao.maps.Size(45, 45)
 	    var imageOption = {offset: new kakao.maps.Point(22, 44)}
-
 			var position = new kakao.maps.LatLng(lat, lng)
 
 			if(type === 'found') {
@@ -142,10 +165,32 @@
 				alert("Failed to draw marker.")
 				//return false
 			}
+			var content = `
+				<div class='info-overlay'>
+					<div class="ol-header">
+						<div style="position: absolute; right: 20px; top: 20px">
+							<button type="button" class="close" onclick="closeOverlays()">×</button>
+						</div>
+					</div>
+					<p>Informations will be here.</p>
+				</div>
+			`
+			var overlay = new kakao.maps.CustomOverlay({
+				position: marker.getPosition(),
+				content: content,
+				clickable: true
+			})
+
+			overlays.push(overlay)
+			kakao.maps.event.addListener(marker, 'click', function() {
+				closeOverlays()
+				overlay.setMap(map)
+			})
 
 			// return marker or false when failed
-			res = marker ? marker : false
-			return res
+
+			return marker ? marker : false
+
 		}
 
 		// Start of loading markers from server.
@@ -178,12 +223,6 @@
 			}
 		})
 
-		function encodeFormData(data) {
-	    return Object.keys(data)
-	        .map(key => encodeURIComponent(key) + '=' + encodeURIComponent(data[key]))
-	        .join('&');
-		}
-
 		//Event Lister when the map is clicked.
 		kakao.maps.event.addListener(map, 'click', function(mouseEvent) {
 			var latlng = mouseEvent.latLng
@@ -199,22 +238,26 @@
 			var type = $('#marker-type option:selected').val()
 			var comment = $('#comment').val()
 
-			var params = {
+			/*var params = {
 				latitude: lat,
 				longitude: lng,
 				type: type,
 				img_url: "not impremented",
 				comment: comment
-			}
+			}*/
+
+			var input = document.querySelector('input[type="file"]')
+
+			var data = new FormData()
+			data.append('latitude', lat)
+			data.append('longitude', lng)
+			data.append('type', type)
+			data.append('comment', comment)
+			data.append('img', input.files[0])
 
 			fetch('http://backendapi.paas-ta.org/marker', {
 			  method: 'POST',
-				headers: {
-        	'Accept': 'application/json',
-         	'Content-Type': 'application/json',
-        },
-				//mode: 'no-cors',
-				body: JSON.stringify(params)
+				body: data
 			})
 			.then(res => res.json())
 			.then(data => {
