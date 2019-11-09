@@ -53,7 +53,9 @@
 	</nav>
 
 	<div id="map" style="width:100%; height: calc(100% - 56px);"></div>
-	<div class="modal fade" id="myModal">
+
+	<!-- INSERT MODAL -->
+	<div class="modal fade" id="insertModal">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content">
 
@@ -98,6 +100,35 @@
     </div>
   </div>
 
+
+	<!-- INFO MODAL -->
+	<div class="modal fade" id="infoModal">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title" id="info-type">타입 정보 여기 표시</h4>
+          <button type="button" class="close" data-dismiss="modal">×</button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+					<img id="info-img" alt="사진" style="width: 100%; height: auto;">
+
+					<p id="info-comment">관련 Comment가 여기에 표시됩니다.</p>
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+					<!--<button type="button" class="btn btn-info" data-dismiss="modal" onclick="addNewMarker()">추가</button>-->
+          <button type="button" class="btn btn-danger" data-dismiss="modal">닫기</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
 	<!-- To use data from anywehre -->
 	<input type="hidden" id="mouseLat" value=""/>
 	<input type="hidden" id="mouseLng" value=""/>
@@ -126,13 +157,6 @@
       })
 		}
 		// End of creating a map
-
-
-		var overlays = []
-		function closeOverlays() {
-			//overlay.setMap(null)
-			overlays.forEach(ol => ol.setMap(null))
-		}
 
 		function drawMarker(info) {
 			var findingImage = 'https://lulrudev.s3.ap-northeast-2.amazonaws.com/img/finding.png'
@@ -164,29 +188,20 @@
 				//return false
 			}
 
-			var content = `
-				<div class='info-overlay'>
-					<div style="position: absolute; right: 12px; top: 8px">
-						<button type="button" class="close" onclick="closeOverlays()">
-							<p style="color: red">x</p>
-						</button>
-					</div>
-					<div class="info-bg" style="background-image: url('${info.img_url}')">
-					</div>
-					<!--<img class="info-img" src="${info.img_url}" style="width: 100%; overflow: hidden;" alt="발견 당시 사진" />-->
-					<p>Informations will be here.</p>
-				</div>
-			`
-			var overlay = new kakao.maps.CustomOverlay({
-				position: marker.getPosition(),
-				content: content,
-				clickable: true
-			})
-
-			overlays.push(overlay)
 			kakao.maps.event.addListener(marker, 'click', function() {
-				closeOverlays()
-				overlay.setMap(map)
+				//closeOverlays()
+				//overlay.setMap(map)
+				var infoTypeString = '로딩중 문제가 발생했습니다.'
+				if(info.type == 'finding') {
+					infoTypeString = '제 강아지좀 찾아주세요..😢'
+				} else if(info.type == 'found') {
+					infoTypeString = '강아지를 찾았어요.!😊'
+				}
+
+				$('#info-type').text(infoTypeString)
+				$('#info-img').attr('src', info.img_url)
+				$('#info-comment').text(info.comment)
+				$('#infoModal').modal()
 			})
 
 			// return marker or false when failed
@@ -224,7 +239,7 @@
 			var latlng = mouseEvent.latLng
 			$('#mouseLat').val(latlng.getLat())
 			$('#mouseLng').val(latlng.getLng())
-	    $('#myModal').modal()
+	    $('#insertModal').modal()
 			//drawMarker(latlng.getLat(), latlng.getLng(), 'found')
 		})
 
