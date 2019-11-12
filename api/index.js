@@ -36,7 +36,8 @@ app.get('/marker', cors(), function(req, res) {
           longitude: rs.longitude,
           comment: rs.comment,
           type: rs.type,
-          marked_time: rs.marked_time
+          marked_time: rs.marked_time,
+          f_time: rs.f_time
         }
         res_list.push(tmp_obj)
       }
@@ -57,10 +58,11 @@ app.post('/marker', cors(), function(req, res) {
     var longitude = fields.longitude
     var comment = fields.comment
     var type = fields.type
+    var f_time = fields.f_time
 
 
-    var sql = 'INSERT INTO markers(latitude, longitude, comment, type) VALUE(?, ?, ?, ?)'
-    var params = [latitude, longitude, comment, type]
+    var sql = 'INSERT INTO markers(latitude, longitude, comment, type, f_time) VALUE(?, ?, ?, ?, ?)'
+    var params = [latitude, longitude, comment, type, f_time]
     conn.query(sql, params, function(err, results) {
       if(err) {
         res.send({res: 'ERROR'})
@@ -69,7 +71,7 @@ app.post('/marker', cors(), function(req, res) {
       else if(results.affectedRows >= 1) {
 
         var ext = path.extname(files.img.name)
-        var fullname = 'img/marker/' + results.insertId + ext
+        var fullname = 'img/marker/img_marker' + results.insertId + ext
         var params = {
           Bucket: 'lulrudev',
           Key: fullname,
@@ -105,7 +107,8 @@ app.post('/marker', cors(), function(req, res) {
                   latitude: latitude,
                   longitude: longitude,
                   comment: comment,
-                  type: type
+                  type: type,
+                  f_time: f_time
                 })
               }
             })
