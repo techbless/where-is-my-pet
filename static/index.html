@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8"/>
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>라온[LAON]</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"></script>
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css" />
+	<style>
+		html, body {
+			padding: 0;
+			margin: 0;
+			width: 100%;
+			height: 100%;
+		}
+		.info-overlay {
+			background-color: white;
+			width: 330px;
+			height: 380px;
+			padding: 0px;
+			position: absolute;
+			left: -165px;
+			bottom: 50px;
+			border-radius: 10px;
+		}
+		.info-bg {
+			width: 330px;
+			height: 200px;
+			background-size: 100% 100%;
+			border-radius: 10px 10px 0px 0px;
+		}
+		#info-comment {
+	    white-space: pre-wrap;       /* Since CSS 2.1 */
+	    white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+	    white-space: -pre-wrap;      /* Opera 4-6 */
+	    white-space: -o-pre-wrap;    /* Opera 7 */
+	    word-wrap: break-word;       /* Internet Explorer 5.5+ */
+			overflow: auto;
+			width: 100%;
+		}
+	</style>
+</head>
+<body>
+	<nav class="navbar navbar-expand-md bg-dark navbar-dark">
+	  <a class="navbar-brand" href="#"><span class="fa fa-calendar"></span>라온[LAON]</a>
+	  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+	    <span class="navbar-toggler-icon"></span>
+	  </button>
+	  <div class="collapse navbar-collapse" id="collapsibleNavbar">
+	    <ul class="navbar-nav">
+	      <li class="nav-item">
+	        <a class="nav-link" href="#">Link</a>
+	      </li>
+	      <li class="nav-item">
+	        <a class="nav-link" href="#">Link</a>
+	      </li>
+	      <li class="nav-item">
+	        <a class="nav-link" href="#">Link</a>
+	      </li>
+	    </ul>
+	  </div>
+	</nav>
+
+	<div id="map" style="width:100%; height: calc(100% - 56px);"></div>
+
+	<!-- INSERT MODAL -->
+	<div class="modal fade" id="insertModal">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">새로운 마커 추가</h4>
+          <button type="button" class="close" data-dismiss="modal">×</button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+          <div class="form-group">
+						<div class="custom-file mb-3">
+							<label class="custom-file-label" for="img-file">발견한 사진을 추가해주세요</label>
+							<input type="file" class="custom-file-input" id="img-file" name="filename" accept=".jpg .jpeg .png .gif">
+						</div>
+
+						<label for="comment">추가 설명</label>
+  					<textarea class="form-control" rows="5" id="comment"></textarea>
+
+						<br>
+
+						<label for="marker-type">마커 유형</label>
+					  <select class="form-control" id="marker-type">
+					    <option value='finding'>제 강아지좀 찾아주세요..😢</option>
+					    <option value='found'>강아지를 찾았어요.!😊</option>
+					  </select>
+
+						<br>
+
+						<label for="datetimepicker1">실종/발견 시간</label>
+						<div class='input-group date' id='datetimepicker1' data-target-input="nearest">
+              <input id="f_time" placeholder="실종/발견한 날짜와 시간을 선택해주세요!" type='text' class="form-control" data-target="#datetimepicker1"/>
+              <span class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
+              	<div class="input-group-text"><span class="fa fa-calendar"></span></div>
+              </span>
+            </div>
+
+						<script>
+
+							$(function () {
+								$('#datetimepicker1').datetimepicker({
+									locale: 'ko'
+								});
+							});
+
+							$(".custom-file-input").on("change", function() {
+							  var fileName = $(this).val().split("\\").pop();
+							  $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+							})
+						</script>
+
+          </div>
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+					<button type="button" class="btn btn-info" data-dismiss="modal" onclick="addNewMarker()">추가</button>
+          <button type="button" class="btn btn-danger" data-dismiss="modal">닫기</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+
+	<!-- INFO MODAL -->
+	<div class="modal fade" id="infoModal">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title" id="info-type">타입 정보 여기 표시</h4>
+          <button type="button" class="close" data-dismiss="modal">×</button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+					<img id="info-img" alt="사진" style="width: 100%; height: auto;">
+
+					<pre id="info-comment">관련 Comment가 여기에 표시됩니다.</pre>
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+					<!--<button type="button" class="btn btn-info" data-dismiss="modal" onclick="addNewMarker()">추가</button>-->
+          <button type="button" class="btn btn-danger" data-dismiss="modal">닫기</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+	<!-- To use data from anywehre -->
+	<input type="hidden" id="mouseLat" value=""/>
+	<input type="hidden" id="mouseLng" value=""/>
+
+	<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=dd7cc743403ed91289c131f3f48d89be"></script>
+	<script>
+
+		// Start of creating a map
+		var options = {
+			center: new kakao.maps.LatLng(37.541272, 126.989387),
+			level: 8
+		}
+		var container = document.getElementById('map');
+		var map = new kakao.maps.Map(container, options);
+
+		if (navigator.geolocation) {
+			//Move center of the map when geolocation can get a location.
+		 	// GeoLocation을 이용해서 접속 위치를 얻어옵니다
+	    navigator.geolocation.getCurrentPosition(function(position) {
+
+        var lat = position.coords.latitude // 위도
+        var lng = position.coords.longitude // 경도
+				var center = new kakao.maps.LatLng(lat, lng)
+				map.setCenter(center)
+				map.setLevel(4)
+      })
+		}
+		// End of creating a map
+
+		function drawMarker(info) {
+			var findingImage = 'https://lulrudev.s3.ap-northeast-2.amazonaws.com/img/finding.png'
+			var foundImage = 'https://lulrudev.s3.ap-northeast-2.amazonaws.com/img/found.png'
+	    var imageSize = new kakao.maps.Size(45, 45)
+	    var imageOption = {offset: new kakao.maps.Point(22, 44)}
+			var position = new kakao.maps.LatLng(info.latitude, info.longitude)
+
+			if(info.type === 'found') {
+				var foundMarkerImage = new kakao.maps.MarkerImage(foundImage, imageSize, imageOption)
+
+				var marker = new kakao.maps.Marker({
+					map: map,
+					position: position,
+					image: foundMarkerImage
+				})
+				//return marker
+			} else if(info.type === 'finding') {
+				var findingMarkerImage = new kakao.maps.MarkerImage(findingImage, imageSize, imageOption)
+
+				var marker = new kakao.maps.Marker({
+					map: map,
+					position: position,
+					image: findingMarkerImage
+				})
+				//return marker
+			} else {
+				alert("Failed to draw marker.")
+				//return false
+			}
+
+			kakao.maps.event.addListener(marker, 'click', function() {
+				//closeOverlays()
+				//overlay.setMap(map)
+				var infoTypeString = '로딩중 문제가 발생했습니다.'
+				if(info.type == 'finding') {
+					infoTypeString = '제 강아지좀 찾아주세요..😢'
+				} else if(info.type == 'found') {
+					infoTypeString = '강아지를 찾았어요.!😊'
+				}
+
+				$('#info-type').text(infoTypeString)
+				$('#info-img').attr('src', info.img_url)
+				$('#info-comment').text(info.comment)
+				$('#infoModal').modal()
+			})
+
+			// return marker or false when failed
+
+			return marker ? marker : false
+
+		}
+
+		// Start of loading markers from server.
+		var found = [], finding = []
+		fetch('http://backendapi.paas-ta.org/marker')
+		.then(res => res.json())
+		.then(data => {
+			finding = data.filter(function(d) {
+				return d.type == 'finding'
+			})
+			found = data.filter(function(d) {
+				return d.type == 'found'
+			})
+
+			for (var i = 0; i < finding.length; i++) {
+				var marker_info = finding[i]
+				drawMarker(marker_info)
+			}
+
+
+			for (var i = 0; i < found.length; i++) {
+				var marker_info = found[i]
+				drawMarker(marker_info)
+			}
+		})
+
+		//Event Lister when the map is clicked.
+		kakao.maps.event.addListener(map, 'click', function(mouseEvent) {
+			var latlng = mouseEvent.latLng
+			$('#mouseLat').val(latlng.getLat())
+			$('#mouseLng').val(latlng.getLng())
+	    $('#insertModal').modal()
+			//drawMarker(latlng.getLat(), latlng.getLng(), 'found')
+		})
+
+		function addNewMarker() {
+			var lat = $('#mouseLat').val()
+			var lng = $('#mouseLng').val()
+			var type = $('#marker-type option:selected').val()
+			var comment = $('#comment').val()
+			var f_time = $('#f_time').val()
+
+
+			var input = document.querySelector('input[type="file"]')
+			var data = new FormData()
+			data.append('latitude', lat)
+			data.append('longitude', lng)
+			data.append('type', type)
+			data.append('comment', comment)
+			data.append('img', input.files[0])
+
+			fetch('http://backendapi.paas-ta.org/marker', {
+			  method: 'POST',
+				body: data
+			})
+			.then(res => res.json())
+			.then(data => {
+				if(data.res == 'SUCCESS') {
+					drawMarker(data)
+					return true
+				} else {
+					return false
+				}
+			})
+
+			// reset all input data in Modal
+			$('#comment').val('')
+			$('#img-file').val('')
+			$('.custom-file-label').addClass("selected").html('발견한 사진을 추가해주세요')
+			$('#marker-type').val('finding')
+			$('#mouseLat').val('')
+			$('#mouseLng').val('')
+			$('#f_time').val('')
+		}
+
+	</script>
+
+
+</body>
+</html>
