@@ -7,11 +7,17 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+	<link href="https://fonts.googleapis.com/css?family=Sunflower:300&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"></script>
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css" />
+	<link rel="shortcut icon" href="/favicon.ico" />
+	<link rel="apple-touch-icon-precomposed" href="/phone.png">
 	<style>
+		* {
+			font-family: 'Sunflower', sans-serif;
+		}
 		html, body {
 			padding: 0;
 			margin: 0;
@@ -43,11 +49,15 @@
 			overflow: auto;
 			width: 100%;
 		}
+		pre {
+			font-size: 16px;
+			font-family: 'Sunflower', sans-serif;
+		}
 	</style>
 </head>
 <body>
 	<nav class="navbar navbar-expand-md bg-dark navbar-dark">
-	  <a class="navbar-brand" href="#"><span class="fa fa-calendar"></span>라온[LAON]</a>
+	  <a class="navbar-brand" href="#">라온[LAON]</a>
 	  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
 	    <span class="navbar-toggler-icon"></span>
 	  </button>
@@ -102,7 +112,14 @@
 
 						<label for="datetimepicker1">실종/발견 시간</label>
 						<div class='input-group date' id='datetimepicker1' data-target-input="nearest">
-              <input id="f_time" placeholder="실종/발견한 날짜와 시간을 선택해주세요!" type='text' class="form-control" data-target="#datetimepicker1"/>
+              <input type='text'
+								class="form-control"
+								id="f_time"
+								inputmode="none"
+								placeholder="실종/발견한 날짜와 시간을 선택해주세요!"
+								data-target="#datetimepicker1"
+								readonly="readonly"
+							/>
               <span class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
               	<div class="input-group-text"><span class="fa fa-calendar"></span></div>
               </span>
@@ -112,18 +129,29 @@
 
 							$(function () {
 								$('#datetimepicker1').datetimepicker({
-									locale: 'ko'
+									locale: 'ko',
+									format: 'YYYY-MM-DD HH:mm',
+									ignoreReadonly: true,
+									//sideBySide: true
 								});
 							});
 
+							//$('#datetimepicker1').on('click', )
+
+							/*$('#insertModal').on('click', function() {
+								$('#datetimepicker1').datetimepicker(hide.datetimepicker)
+							})*/
+
 							$(".custom-file-input").on("change", function() {
-							  var fileName = $(this).val().split("\\").pop();
-							  $(this).siblings(".custom-file-label").addClass("selected").html(fileName);
+							  var fileName = $(this).val().split("\\").pop()
+							  $(this).siblings(".custom-file-label").addClass("selected").html(fileName)
 							})
 						</script>
 
           </div>
-        </div>
+        </m,k.
+				'\]lo[pijuhfxc <ddeawzsxder4W3Q>aSZXDfcvgbhjn;'/
+					|}[p-im nb]'</ddeawzsxder4W3Q>]'/div>
 
         <!-- Modal footer -->
         <div class="modal-footer">
@@ -152,10 +180,13 @@
 					<img id="info-img" alt="사진" style="width: 100%; height: auto;">
 
 					<pre id="info-comment">관련 Comment가 여기에 표시됩니다.</pre>
+					<p id="info-f-time" style="font-size: 14px; position: absolute; right: 10px; bottom: -5px;">실종/발견 시간</p>
         </div>
+
 
         <!-- Modal footer -->
         <div class="modal-footer">
+
 					<!--<button type="button" class="btn btn-info" data-dismiss="modal" onclick="addNewMarker()">추가</button>-->
           <button type="button" class="btn btn-danger" data-dismiss="modal">닫기</button>
         </div>
@@ -227,12 +258,16 @@
 				//closeOverlays()
 				//overlay.setMap(map)
 				var infoTypeString = '로딩중 문제가 발생했습니다.'
+				var infoFtimeString = '로딩중 문제가 발생했습니다.'
 				if(info.type == 'finding') {
 					infoTypeString = '제 강아지좀 찾아주세요..😢'
+					infoFtimeString = '실종 시간 : ' + info.f_time
 				} else if(info.type == 'found') {
 					infoTypeString = '강아지를 찾았어요.!😊'
+					infoFtimeString = '발견 시간 : ' + info.f_time
 				}
 
+				$('#info-f-time').text(infoFtimeString)
 				$('#info-type').text(infoTypeString)
 				$('#info-img').attr('src', info.img_url)
 				$('#info-comment').text(info.comment)
@@ -293,6 +328,7 @@
 			data.append('type', type)
 			data.append('comment', comment)
 			data.append('img', input.files[0])
+			data.append('f_time', f_time)
 
 			fetch('http://backendapi.paas-ta.org/marker', {
 			  method: 'POST',
