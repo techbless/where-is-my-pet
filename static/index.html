@@ -53,6 +53,11 @@
 			font-size: 16px;
 			font-family: 'Sunflower', sans-serif;
 		}
+		#if{
+      width: 0px;
+      height: 0px;
+      border: 0px;
+    }
 	</style>
 </head>
 <body>
@@ -90,76 +95,77 @@
         </div>
 
         <!-- Modal body -->
-        <div class="modal-body">
-          <div class="form-group">
-						<div class="custom-file mb-3">
-							<label class="custom-file-label" for="img-file">발견한 사진을 추가해주세요</label>
-							<input type="file" class="custom-file-input" id="img-file" name="filename" accept=".jpg .jpeg .png .gif">
-						</div>
+				<form target="preventRedirect">
+	        <div class="modal-body">
+	          <div class="form-group">
+							<div class="custom-file mb-3">
+								<label class="custom-file-label" for="img-file">발견한 사진을 추가해주세요</label>
+								<input type="file"
+									class="custom-file-input"
+									id="img-file"
+									name="filename"
+									accept="image/*"
+									required="true" />
+							</div>
 
-						<label for="comment">추가 설명</label>
-  					<textarea class="form-control" rows="5" id="comment"></textarea>
+							<label for="comment">추가 설명</label>
+	  					<textarea class="form-control" rows="5" id="comment" required></textarea>
 
-						<br>
+							<br>
 
-						<label for="marker-type">마커 유형</label>
-					  <select class="form-control" id="marker-type">
-					    <option value='finding'>제 강아지좀 찾아주세요..😢</option>
-					    <option value='found'>강아지를 찾았어요.!😊</option>
-					  </select>
+							<label for="marker-type">마커 유형</label>
+						  <select class="form-control" id="marker-type">
+						    <option value='finding' selected>제 반려동물좀 찾아주세요..😢</option>
+						    <option value='found'>반려동물을 찾았어요.!😊</option>
+						  </select>
 
-						<br>
+							<br>
 
-						<label for="datetimepicker1">실종/발견 시간</label>
-						<div class='input-group date' id='datetimepicker1' data-target-input="nearest">
-              <input type='text'
-								class="form-control"
-								id="f_time"
-								inputmode="none"
-								placeholder="실종/발견한 날짜와 시간을 선택해주세요!"
-								data-target="#datetimepicker1"
-								readonly="readonly"
-							/>
-              <span class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
-              	<div class="input-group-text"><span class="fa fa-calendar"></span></div>
-              </span>
-            </div>
+							<label for="datetimepicker1">실종/발견 시간</label>
+							<div class='input-group date' id='datetimepicker1' data-target-input="nearest">
+	              <input type='text'
+									class="form-control"
+									id="f_time"
+									inputmode="none"
+									placeholder="실종/발견한 날짜와 시간을 선택해주세요!"
+									data-target="#datetimepicker1"
+									readonly
+								/>
+	              <span class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
+	              	<div class="input-group-text"><span class="fa fa-calendar"></span></div>
+	              </span>
+	            </div>
+	          </div>
+	        </div>
 
-						<script>
-
-							$(function () {
-								$('#datetimepicker1').datetimepicker({
-									locale: 'ko',
-									format: 'YYYY-MM-DD HH:mm',
-									ignoreReadonly: true,
-									//sideBySide: true
-								});
-							});
-
-							//$('#datetimepicker1').on('click', )
-
-							/*$('#insertModal').on('click', function() {
-								$('#datetimepicker1').datetimepicker(hide.datetimepicker)
-							})*/
-
-							$(".custom-file-input").on("change", function() {
-							  var fileName = $(this).val().split("\\").pop()
-							  $(this).siblings(".custom-file-label").addClass("selected").html(fileName)
-							})
-						</script>
-
-          </div>
-        </div>
-
-        <!-- Modal footer -->
-        <div class="modal-footer">
-					<button type="button" class="btn btn-info" data-dismiss="modal" onclick="addNewMarker()">추가</button>
-          <button type="button" class="btn btn-danger" data-dismiss="modal">닫기</button>
-        </div>
+	        <!-- Modal footer -->
+	        <div class="modal-footer">
+						<input type="submit" class="btn btn-info" onclick="addNewMarker()">
+	          <button type="button" class="btn btn-danger" data-dismiss="modal">닫기</button>
+	        </div>
+				</form>
 
       </div>
     </div>
   </div>
+	<iframe id="if" name="preventRedirect"></iframe>
+	<script>
+
+		$(function () {
+			$('#datetimepicker1').datetimepicker({
+				locale: 'ko',
+				format: 'YYYY-MM-DD HH:mm',
+				ignoreReadonly: true,
+				//sideBySide: true
+			});
+		});
+
+		$(".custom-file-input").on("change", function() {
+			var fileName = $(this).val().split("\\").pop()
+			$(this).siblings(".custom-file-label").addClass("selected").html(fileName)
+		})
+	</script>
+
 
 
 	<!-- INFO MODAL -->
@@ -257,12 +263,15 @@
 				//overlay.setMap(map)
 				var infoTypeString = '로딩중 문제가 발생했습니다.'
 				var infoFtimeString = '로딩중 문제가 발생했습니다.'
+				var f_time = info.f_time
+				f_time = f_time.replace('T', ' ')
+				f_time = f_time.replace(':00.000Z', '')
 				if(info.type == 'finding') {
-					infoTypeString = '제 강아지좀 찾아주세요..😢'
-					infoFtimeString = '실종 시간 : ' + info.f_time
+					infoTypeString = '제 반려동물좀 찾아주세요..😢'
+					infoFtimeString = '실종 시간 : ' + f_time
 				} else if(info.type == 'found') {
-					infoTypeString = '강아지를 찾았어요.!😊'
-					infoFtimeString = '발견 시간 : ' + info.f_time
+					infoTypeString = '반려동물을 찾았어요.!😊'
+					infoFtimeString = '발견 시간 : ' + f_time
 				}
 
 				$('#info-f-time').text(infoFtimeString)
@@ -311,6 +320,8 @@
 			//drawMarker(latlng.getLat(), latlng.getLng(), 'found')
 		})
 
+
+
 		function addNewMarker() {
 			var lat = $('#mouseLat').val()
 			var lng = $('#mouseLng').val()
@@ -318,38 +329,47 @@
 			var comment = $('#comment').val()
 			var f_time = $('#f_time').val()
 
-
-			var input = document.querySelector('input[type="file"]')
-			var data = new FormData()
-			data.append('latitude', lat)
-			data.append('longitude', lng)
-			data.append('type', type)
-			data.append('comment', comment)
-			data.append('img', input.files[0])
-			data.append('f_time', f_time)
-
-			fetch('http://backendapi.paas-ta.org/marker', {
-			  method: 'POST',
-				body: data
-			})
-			.then(res => res.json())
-			.then(data => {
-				if(data.res == 'SUCCESS') {
-					drawMarker(data)
-					return true
+			if((lat != '') && (lng != '') && (type != '') && (comment != '')) {
+				const reg = /[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]/
+			  var isValidDate = reg.test(f_time)
+				if(!isValidDate) {
+					$('#f_time').val('올바른 날짜와 시간을 입력해주세요.')
+					alert('유효한 날짜와 시간을 입력해주세요.')
 				} else {
-					return false
-				}
-			})
+					var input = document.querySelector('input[type="file"]')
+					var data = new FormData()
+					data.append('latitude', lat)
+					data.append('longitude', lng)
+					data.append('type', type)
+					data.append('comment', comment)
+					data.append('img', input.files[0])
+					data.append('f_time', f_time)
 
-			// reset all input data in Modal
-			$('#comment').val('')
-			$('#img-file').val('')
-			$('.custom-file-label').addClass("selected").html('발견한 사진을 추가해주세요')
-			$('#marker-type').val('finding')
-			$('#mouseLat').val('')
-			$('#mouseLng').val('')
-			$('#f_time').val('')
+					fetch('http://backendapi.paas-ta.org/marker', {
+					  method: 'POST',
+						body: data
+					})
+					.then(res => res.json())
+					.then(data => {
+						if(data.res == 'SUCCESS') {
+							drawMarker(data)
+							return true
+						} else {
+							return false
+						}
+					})
+
+					// reset all input data in Modal
+					$('#comment').val('')
+					$('#img-file').val('')
+					$('.custom-file-label').addClass("selected").html('발견한 사진을 추가해주세요')
+					$('#marker-type').val('finding')
+					$('#mouseLat').val('')
+					$('#mouseLng').val('')
+					$('#f_time').val('')
+					$('#insertModal').modal('hide')
+				}
+			}
 		}
 
 	</script>
