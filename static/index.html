@@ -59,6 +59,11 @@
       border: 0px;
     }
 	</style>
+	<script>
+		$(document).ready(function() {
+			$('#howtouse').modal()
+		})
+	</script>
 </head>
 <body>
 	<nav class="navbar navbar-expand-md bg-dark navbar-dark">
@@ -82,6 +87,32 @@
 	</nav>
 
 	<div id="map" style="width:100%; height: calc(100% - 56px);"></div>
+
+	<!-- The Modal -->
+  <div class="modal fade" id="howtouse">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+      <div class="modal-content">
+
+        <!-- Modal Header -->
+        <div class="modal-header">
+          <h4 class="modal-title">설명</h4>
+          <button type="button" class="close" data-dismiss="modal">&times;</button>
+        </div>
+
+        <!-- Modal body -->
+        <div class="modal-body">
+          <pre style="width: 100%;">어떻게 쓰는건지 알려줄게요.
+잘들어봐봐요.</pre>
+        </div>
+
+        <!-- Modal footer -->
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+
+      </div>
+    </div>
+  </div>
 
 	<!-- INSERT MODAL -->
 	<div class="modal fade" id="insertModal">
@@ -115,8 +146,8 @@
 
 							<label for="marker-type">마커 유형</label>
 						  <select class="form-control" id="marker-type">
-						    <option value='finding' selected>제 반려동물좀 찾아주세요..😢</option>
-						    <option value='found'>반려동물을 찾았어요.!😊</option>
+						    <option value='finding' selected>제 반려동물좀 찾아주세요..</option>
+						    <option value='found'>주인을 잃어버린거 같아요.!</option>
 						  </select>
 
 							<br>
@@ -140,7 +171,7 @@
 
 	        <!-- Modal footer -->
 	        <div class="modal-footer">
-						<input type="submit" class="btn btn-info" onclick="addNewMarker()">
+						<input type="submit" class="btn btn-info" onclick="addNewMarker()" value="추가">
 	          <button type="button" class="btn btn-danger" data-dismiss="modal">닫기</button>
 	        </div>
 				</form>
@@ -229,8 +260,8 @@
 		// End of creating a map
 
 		function drawMarker(info) {
-			var findingImage = 'https://lulrudev.s3.ap-northeast-2.amazonaws.com/img/finding.png'
-			var foundImage = 'https://lulrudev.s3.ap-northeast-2.amazonaws.com/img/found.png'
+			var findingImage = '/img/finding.png'
+			var foundImage = '/img/found.png'
 	    var imageSize = new kakao.maps.Size(45, 45)
 	    var imageOption = {offset: new kakao.maps.Point(22, 44)}
 			var position = new kakao.maps.LatLng(info.latitude, info.longitude)
@@ -267,10 +298,10 @@
 				f_time = f_time.replace('T', ' ')
 				f_time = f_time.replace(':00.000Z', '')
 				if(info.type == 'finding') {
-					infoTypeString = '제 반려동물좀 찾아주세요..😢'
+					infoTypeString = '제 반려동물좀 찾아주세요..'
 					infoFtimeString = '실종 시간 : ' + f_time
 				} else if(info.type == 'found') {
-					infoTypeString = '반려동물을 찾았어요.!😊'
+					infoTypeString = '주인을 잃어버린거 같아요.!'
 					infoFtimeString = '발견 시간 : ' + f_time
 				}
 
@@ -329,7 +360,7 @@
 			var comment = $('#comment').val()
 			var f_time = $('#f_time').val()
 
-			if((lat != '') && (lng != '') && (type != '') && (comment != '')) {
+			if(($('#img-file').val() != '') && (lat != '') && (lng != '') && (type != '') && (comment != '')) {
 				const reg = /[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]/
 			  var isValidDate = reg.test(f_time)
 				if(!isValidDate) {
@@ -353,9 +384,8 @@
 					.then(data => {
 						if(data.res == 'SUCCESS') {
 							drawMarker(data)
-							return true
 						} else {
-							return false
+							alert("마커를 추가하는 중에 문제가 발생했습니다.")
 						}
 					})
 
