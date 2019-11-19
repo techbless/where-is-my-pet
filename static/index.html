@@ -54,15 +54,42 @@
 			font-family: 'Sunflower', sans-serif;
 		}
 		#if{
+			padding: 0px;
+			margin: 0px;
       width: 0px;
       height: 0px;
       border: 0px;
     }
 	</style>
 	<script>
+		var setCookie = function(name, value, exp) {
+			var date = new Date();
+			date.setTime(date.getTime() + exp*24*60*60*1000);
+			document.cookie = name + '=' + value + ';expires=' + date.toUTCString() + ';path=/';
+		};
+		var getCookie = function(name) {
+			var value = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+			return value? value[2] : null;
+		};
+
 		$(document).ready(function() {
-			$('#howtouse').modal()
+			const agree = getCookie('agree')
+			if(agree != 'true') {
+				$('#howtouse').modal({backdrop: 'static', keyboard: false})
+			}
 		})
+		function agree() {
+			//alert('clicked')
+			const checkbox = $('#agree-cb').is(':checked')
+			if(checkbox == true) {
+				setCookie('agree', "true", 7)
+				alert('서비스 이용약관에 동의하셨습니다. 7일간 초기 화면이 표시되지 않습니다.')
+				$('#howtouse').modal('hide')
+			} else {
+				alert('서비스를 이용하려면 이용약관에 동의해주세요.')
+			}
+
+		}
 	</script>
 </head>
 <body>
@@ -74,19 +101,23 @@
 	  <div class="collapse navbar-collapse" id="collapsibleNavbar">
 	    <ul class="navbar-nav">
 	      <li class="nav-item">
-	        <a class="nav-link" href="#">Link</a>
+	        <a class="nav-link" href="#" onclick="markerSwitch('finding')">실종만 표시</a>
 	      </li>
 	      <li class="nav-item">
-	        <a class="nav-link" href="#">Link</a>
+	        <a class="nav-link" href="#" onclick="markerSwitch('found')">발견만 표시</a>
 	      </li>
-	      <li class="nav-item">
-	        <a class="nav-link" href="#">Link</a>
+				<li class="nav-item">
+	        <a class="nav-link" href="#" onclick="markerSwitch('all')">모두 표시</a>
+	      </li>
+				<li class="nav-item">
+	        <a class="nav-link" href="#" onclick="$('#howtouse').modal()">사용 설명</a>
 	      </li>
 	    </ul>
 	  </div>
 	</nav>
 
-	<div id="map" style="width:100%; height: calc(100% - 56px);"></div>
+
+	<div id="map" style="width:100%; height: calc(100% - 56px); padding: 0; margin: 0;"></div>
 
 	<!-- The Modal -->
   <div class="modal fade" id="howtouse">
@@ -95,19 +126,52 @@
 
         <!-- Modal Header -->
         <div class="modal-header">
-          <h4 class="modal-title">설명</h4>
-          <button type="button" class="close" data-dismiss="modal">&times;</button>
+          <h4 class="modal-title">사용법 및 안내</h4>
+          <!--<button type="button" class="close" data-dismiss="modal">&times;</button>-->
         </div>
 
         <!-- Modal body -->
         <div class="modal-body">
-          <pre style="width: 100%;">어떻게 쓰는건지 알려줄게요.
-잘들어봐봐요.</pre>
+
+					<br><h3>정보 등록</h3><br>
+					<ul>
+					  <li>위치 및 추가정보 등록방법</li>
+					  <ol>
+					    <li>잃어버리거나 발견한 위치를 클릭하여 주세요.</li>
+					    <li>마커 추가 창이 뜨면 사진을 선택한후 추가설명을 포함하여 모든 입력란을 채워주세요.</li>
+					    <li>달력 아이콘을 눌러 날짜와 시간을 선택할 수 있습니다.</li>
+					    <li>날짜를 선택한후 달력바로 밑 시계아이콘을 출력하여 꼭 시간도 선택해주세요.</li>
+					    <li>실종과 발견 아이콘을 서로 다릅니다. 마커 유형을 알맞게 선택해주세요.</li>
+					    <li><strong>사진 크기 및 용량이 큰경우 마커 생성에 약간의 시간이 필요합니다. 페이지를 새로고침 하거나 나가지 말아주세요.</strong></li>
+					  </ol>
+					</ul>
+
+					<br><h3>정보 조회</h3><br>
+					<ul>
+					  <li>등록된 정보 조회방법</li>
+					  <ol>
+					    <li>물음표(?)가 그려진 빨간색 마커는 잃어버린 위치 정보를 의미합니다.</li>
+					    <li>느낌표(!)가 그려진 초록색 마커는 발견한 위치 정보를 의미합니다.</li>
+					    <li>지도에 표시된 마커를 눌러 자세한 정보를 확인하실 수 있습니다.</li>
+					  </ol>
+					</ul>
+
+					<br><h3>자료 보관 기간</h3><br>
+					<ul>
+					  <li>자료 보관 기간 안내</li>
+					  <ul>
+					    <li>한번 등록된 정보는 72시간이후 매시간 주기적으로 필터링 되어 삭제 됩니다.</li>
+					    <li>따라서 모든 마커 유지 기간은 모두 다르나 약 3일 후 사진 이외에 모든 정보는 삭제됩니다.</li>
+					    <li>업로드된 사진은 원할한 서비스 및 관리를 위해여 5일간 보관된 후 삭제됩니다.</li>
+					  </ul>
+					</ul>
+
         </div>
 
         <!-- Modal footer -->
         <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+					<input type="checkbox" id="agree-cb">위의 내용을 모두 이해하였습니다.
+          <button type="button" class="btn btn-secondary" onclick="agree()">확인</button>
         </div>
 
       </div>
@@ -285,7 +349,7 @@
 				})
 				//return marker
 			} else {
-				alert("Failed to draw marker.")
+				alert("Failed to draw a marker.")
 				//return false
 			}
 
@@ -320,6 +384,7 @@
 
 		// Start of loading markers from server.
 		var found = [], finding = []
+		var found_m = [], finding_m = []
 		fetch('http://backendapi.paas-ta.org/marker')
 		.then(res => res.json())
 		.then(data => {
@@ -332,15 +397,38 @@
 
 			for (var i = 0; i < finding.length; i++) {
 				var marker_info = finding[i]
-				drawMarker(marker_info)
+				finding_m.push(drawMarker(marker_info))
 			}
 
 
 			for (var i = 0; i < found.length; i++) {
 				var marker_info = found[i]
-				drawMarker(marker_info)
+				found_m.push(drawMarker(marker_info))
 			}
 		})
+
+		function markerSwitch(type) {
+			var finding_map, found_map
+			if(type == 'all') {
+				finding_map = map
+				found_map = map
+			} else if(type == 'finding') {
+				finding_map = map
+				found_map = null
+			} else if(type == 'found') {
+				finding_map = null
+				found_map = map
+			} else {
+				return
+			}
+
+			for (var i = 0; i < finding_m.length; i++) {
+				finding_m[i].setMap(finding_map)
+			}
+			for (var i = 0; i < found_m.length; i++) {
+				found_m[i].setMap(found_map)
+			}
+		}
 
 		//Event Lister when the map is clicked.
 		kakao.maps.event.addListener(map, 'click', function(mouseEvent) {
