@@ -4,6 +4,8 @@
 	<meta charset="utf-8"/>
 	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
 	<title>라온[LAON]</title>
+	<script src=https://cdn.jsdelivr.net/npm/promise-polyfill@8.1/dist/polyfill.min.js></script>
+<script src=https://cdn.jsdelivr.net/npm/whatwg-fetch@3.0/dist/fetch.umd.min.js></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
@@ -83,10 +85,10 @@
 			const checkbox = $('#agree-cb').is(':checked')
 			if(checkbox == true) {
 				setCookie('agree', "true", 7)
-				alert('서비스 이용약관에 동의하셨습니다. 7일간 초기 화면이 표시되지 않습니다.')
+				alert('실종하거나 발견한 위치를 지도에서 클릭해주세요.')
 				$('#howtouse').modal('hide')
 			} else {
-				alert('서비스를 이용하려면 이용약관에 동의해주세요.')
+				alert('서비스를 이용하려면 모두 읽고 이해 후 체크해주세요.')
 			}
 
 		}
@@ -142,7 +144,7 @@
 					    <li>달력 아이콘을 눌러 날짜와 시간을 선택할 수 있습니다.</li>
 					    <li>날짜를 선택한후 달력바로 밑 시계아이콘을 출력하여 꼭 시간도 선택해주세요.</li>
 					    <li>실종과 발견 아이콘을 서로 다릅니다. 마커 유형을 알맞게 선택해주세요.</li>
-					    <li><strong>사진 크기 및 용량이 큰경우 마커 생성에 약간의 시간이 필요합니다. 페이지를 새로고침 하거나 나가지 말아주세요.</strong></li>
+					    <li style="color: blue;"><strong>사진 크기 및 용량이 큰경우 마커 생성에 약간의 시간이 필요합니다. 페이지를 새로고침 하거나 나가지 말아주세요.</strong></li>
 					  </ol>
 					</ul>
 
@@ -165,6 +167,8 @@
 					    <li>업로드된 사진은 원할한 서비스 및 관리를 위해여 5일간 보관된 후 삭제됩니다.</li>
 					  </ul>
 					</ul>
+
+					<p>아래의 확인 버튼을 클릭하면 7일간 초기 화면이 표시되지 않습니다. 다시 확인하려면 상단메뉴바에서 '사용설명'을 확인해주세요.</p>
 
         </div>
 
@@ -382,15 +386,20 @@
 
 		}
 
+
+
 		// Start of loading markers from server.
 		var found = [], finding = []
 		var found_m = [], finding_m = []
 		fetch('http://backendapi.paas-ta.org/marker')
-		.then(res => res.json())
-		.then(data => {
+		.then(function(res) {
+			return res.json()
+		})
+		.then(function(data) {
 			finding = data.filter(function(d) {
 				return d.type == 'finding'
 			})
+
 			found = data.filter(function(d) {
 				return d.type == 'found'
 			})
@@ -399,7 +408,6 @@
 				var marker_info = finding[i]
 				finding_m.push(drawMarker(marker_info))
 			}
-
 
 			for (var i = 0; i < found.length; i++) {
 				var marker_info = found[i]
@@ -468,8 +476,10 @@
 					  method: 'POST',
 						body: data
 					})
-					.then(res => res.json())
-					.then(data => {
+					.then(function(res) {
+						return res.json()
+					})
+					.then(function(data) {
 						if(data.res == 'SUCCESS') {
 							drawMarker(data)
 						} else {

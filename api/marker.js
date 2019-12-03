@@ -5,9 +5,12 @@ var formidable = require('formidable')
 var fs = require('fs')
 var path = require('path')
 
+
+
 /* GET METHOD
   - get all markers information in database.
 */
+
 exports.getMarkers = function(req, res) {
   var res_list = []
   var sql = 'SELECT * FROM markers'
@@ -46,7 +49,9 @@ function validDateTimeFormat(dt) {
   return reg.test(dt)
 }
 exports.insertMarker = function(req, res) {
+
   try {
+
     var form = new formidable.IncomingForm()
 
     form.parse(req, function(err, fields, files) {
@@ -117,6 +122,7 @@ exports.insertMarker = function(req, res) {
                     type: type,
                     f_time: f_time
                   })
+
                 }
               })
             }

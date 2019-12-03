@@ -18,15 +18,18 @@ app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(cors())
 
-app.get('/marker', cors(), marker.getMarkers)
-app.post('/marker', cors(), marker.insertMarker)
-app.delete('/marker/:m_id', cors(), marker.deleteMarker)
+/*var corsOptions = {
+  origin :'http://whereismypet.paas-ta.org'
+};*/
+app.get('/marker', cors(/*corsOptions*/), marker.getMarkers)
+app.post('/marker', cors(/*corsOptions*/), marker.insertMarker)
+app.delete('/marker/:m_id', cors(/*corsOptions*/), marker.deleteMarker)
 app.get('/', function(req, res) {
   res.send("Hello World")
 })
 
 app.listen(process.env.PORT || 3000, function() {
-  console.log("listen on port 3000.")
+  console.log("Server Started" )
 })
 
 setInterval(function() {
