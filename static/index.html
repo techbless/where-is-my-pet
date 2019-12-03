@@ -114,6 +114,9 @@
 				<li class="nav-item">
 	        <a class="nav-link" href="#" onclick="$('#howtouse').modal()">사용 설명</a>
 	      </li>
+				<li class="nav-item">
+	        <a class="nav-link" href="#" onclick="$('#search-modal').modal()">검색</a>
+	      </li>
 	    </ul>
 	  </div>
 	</nav>
@@ -265,6 +268,37 @@
 		})
 	</script>
 
+	<!-- SEARCH -->
+	<div class="modal fade" id="search-modal">
+		<div class="modal-dialog modal-dialog-centered">
+			<div class="modal-content">
+
+				<!-- Modal Header -->
+				<div class="modal-header">
+					<h4 class="modal-title" id="info-type">검색</h4>
+					<button type="button" class="close" data-dismiss="modal">×</button>
+				</div>
+
+				<!-- Modal body -->
+				<div class="modal-body">
+					<div class="form-group">
+					  <label for="search-word">검색어 </label>
+					  <input type="text" class="form-control" id="search-word">
+					</div>
+				</div>
+
+
+				<!-- Modal footer -->
+				<div class="modal-footer">
+					<!--<button type="button" class="btn btn-info" data-dismiss="modal" onclick="addNewMarker()">추가</button>-->
+					<button type="button" class="btn" data-dismiss="modal" onclick="markerSwitch('all')">초기화</button>
+					<button type="button" class="btn btn-success" data-dismiss="modal" onclick="searchMarker()">검색</button>
+					<button type="button" class="btn btn-danger" data-dismiss="modal">닫기</button>
+				</div>
+
+			</div>
+		</div>
+	</div>
 
 
 	<!-- INFO MODAL -->
@@ -497,6 +531,47 @@
 					$('#f_time').val('')
 					$('#insertModal').modal('hide')
 				}
+			}
+		}
+
+		function searchMarker() {
+			const word = $('#search-word').val()
+			console.log(word)
+
+			var idxOfFinding = []
+			var idxOfFound = []
+
+			for(var i = 0; i < finding.length; i++) {
+				if(finding[i].comment.includes(word)) {
+					idxOfFinding.push(i)
+				}
+			}
+
+			for(var i = 0; i < found.length; i++) {
+				if(found[i].comment.includes(word)) {
+					idxOfFound.push(i)
+				}
+			}
+
+
+			if(!(idxOfFound.length == 0 && idxOfFinding.length == 0)) {
+				for (var i = 0; i < finding_m.length; i++) {
+					finding_m[i].setMap(null)
+				}
+				for (var i = 0; i < found_m.length; i++) {
+					found_m[i].setMap(null)
+				}
+
+				for (var i = 0; i < idxOfFinding.length; i++) {
+					var idx = idxOfFinding[i]
+					finding_m[idx].setMap(map)
+				}
+				for (var i = 0; i < idxOfFound.length; i++) {
+					var idx = idxOfFound[i]
+					found_m[idx].setMap(map)
+				}
+			} else {
+				alert("검색 결과가 존재하지 않습니다.")
 			}
 		}
 
