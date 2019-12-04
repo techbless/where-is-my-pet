@@ -270,34 +270,36 @@
 
 	<!-- SEARCH -->
 	<div class="modal fade" id="search-modal">
-		<div class="modal-dialog modal-dialog-centered">
-			<div class="modal-content">
+		<form>
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
 
-				<!-- Modal Header -->
-				<div class="modal-header">
-					<h4 class="modal-title" id="info-type">검색</h4>
-					<button type="button" class="close" data-dismiss="modal">×</button>
-				</div>
-
-				<!-- Modal body -->
-				<div class="modal-body">
-					<div class="form-group">
-					  <label for="search-word">검색어 </label>
-					  <input type="text" class="form-control" id="search-word">
+					<!-- Modal Header -->
+					<div class="modal-header">
+						<h4 class="modal-title" id="info-type">검색</h4>
+						<button type="button" class="close" data-dismiss="modal">×</button>
 					</div>
+
+					<!-- Modal body -->
+					<div class="modal-body">
+						<div class="form-group">
+							<label for="search-word">검색어</label>
+							<input type="text" class="form-control" id="search-word" autofocus>
+						</div>
+					</div>
+
+					<!-- Modal footer -->
+					<div class="modal-footer">
+						<!--<button type="button" class="btn btn-info" data-dismiss="modal" onclick="addNewMarker()">추가</button>-->
+						<button type="button" class="btn" data-dismiss="modal" onclick="markerSwitch('all')">초기화</button>
+						<input type="submit" class="btn btn-success" data-dismiss="modal" onclick="searchMarker()" value="검색">
+						<!--<button type="button" class="btn btn-success" data-dismiss="modal" onclick="searchMarker()">검색</button>-->
+						<button type="button" class="btn btn-danger" data-dismiss="modal">닫기</button>
+					</div>
+
 				</div>
-
-
-				<!-- Modal footer -->
-				<div class="modal-footer">
-					<!--<button type="button" class="btn btn-info" data-dismiss="modal" onclick="addNewMarker()">추가</button>-->
-					<button type="button" class="btn" data-dismiss="modal" onclick="markerSwitch('all')">초기화</button>
-					<button type="button" class="btn btn-success" data-dismiss="modal" onclick="searchMarker()">검색</button>
-					<button type="button" class="btn btn-danger" data-dismiss="modal">닫기</button>
-				</div>
-
 			</div>
-		</div>
+		</form>
 	</div>
 
 
@@ -323,8 +325,9 @@
 
         <!-- Modal footer -->
         <div class="modal-footer">
-
+					<input type="hidden" id="m_id" value="" />
 					<!--<button type="button" class="btn btn-info" data-dismiss="modal" onclick="addNewMarker()">추가</button>-->
+					<button type="button" class="btn" data-dismiss="modal" onclick="deleteMarker()">삭제</button>
           <button type="button" class="btn btn-danger" data-dismiss="modal">닫기</button>
         </div>
 
@@ -360,6 +363,31 @@
       })
 		}
 		// End of creating a map
+
+		function deleteMarker() {
+			var m_id = $('#m_id').val()
+			var auth = prompt('등록하실때 입력한 비밀번호를 입력해주세요')
+
+			if(!auth) {
+				alert("비밀번호를 입력해주세요")
+			} else {
+				const url = 'http://backendapi.paas-ta.org/marker/' + m_id + '?auth=' + auth
+				fetch(url, {
+					method: 'DELETE'
+				})
+				.then(function(res) {
+					return res.json()
+				})
+				.then(function(status) {
+					if(status.res == 'SUCCESS') {
+						alert("성공적으로 삭제를 완료했습니다.")
+						window.location.reload()
+					} else {
+						alert("삭제중 오류가 발생했습니다. 비밀번호를 확인해주세요.")
+					}
+				})
+			}
+		}
 
 		function drawMarker(info) {
 			var findingImage = '/img/finding.png'
@@ -412,6 +440,7 @@
 				$('#info-img').attr('src', info.img_url)
 				$('#info-comment').text(info.comment)
 				$('#infoModal').modal()
+				$('#m_id').val(info.m_id)
 			})
 
 			// return marker or false when failed
@@ -497,41 +526,48 @@
 					$('#f_time').val('올바른 날짜와 시간을 입력해주세요.')
 					alert('유효한 날짜와 시간을 입력해주세요.')
 				} else {
-					var input = document.querySelector('input[type="file"]')
-					var data = new FormData()
-					data.append('latitude', lat)
-					data.append('longitude', lng)
-					data.append('type', type)
-					data.append('comment', comment)
-					data.append('img', input.files[0])
-					data.append('f_time', f_time)
+					var auth = prompt("삭제하실때 이용할 비밀번호를 입력해주세요.", "p@ssw0rd")
+					if(!auth) {
+						alert("유효한 비밀번호를 입력해주세요.[4자 이상]")
+					} else {
+						var input = document.querySelector('input[type="file"]')
+						var data = new FormData()
+						data.append('latitude', lat)
+						data.append('longitude', lng)
+						data.append('type', type)
+						data.append('comment', comment)
+						data.append('img', input.files[0])
+						data.append('f_time', f_time)
+						data.append('auth', auth)
 
-					fetch('http://backendapi.paas-ta.org/marker', {
-					  method: 'POST',
-						body: data
-					})
-					.then(function(res) {
-						return res.json()
-					})
-					.then(function(data) {
-						if(data.res == 'SUCCESS') {
-							drawMarker(data)
-						} else {
-							alert("마커를 추가하는 중에 문제가 발생했습니다.")
-						}
-					})
+						fetch('http://backendapi.paas-ta.org/marker', {
+						  method: 'POST',
+							body: data
+						})
+						.then(function(res) {
+							return res.json()
+						})
+						.then(function(data) {
+							if(data.res == 'SUCCESS') {
+								drawMarker(data)
+							} else {
+								alert("마커를 추가하는 중에 문제가 발생했습니다.")
+							}
+						})
 
-					// reset all input data in Modal
-					$('#comment').val('')
-					$('#img-file').val('')
-					$('.custom-file-label').addClass("selected").html('발견한 사진을 추가해주세요')
-					$('#marker-type').val('finding')
-					$('#mouseLat').val('')
-					$('#mouseLng').val('')
-					$('#f_time').val('')
-					$('#insertModal').modal('hide')
+						// reset all input data in Modal
+						$('#comment').val('')
+						$('#img-file').val('')
+						$('.custom-file-label').addClass("selected").html('발견한 사진을 추가해주세요')
+						$('#marker-type').val('finding')
+						$('#mouseLat').val('')
+						$('#mouseLng').val('')
+						$('#f_time').val('')
+						$('#insertModal').modal('hide')
+					}
 				}
 			}
+
 		}
 
 		function searchMarker() {
@@ -570,9 +606,12 @@
 					var idx = idxOfFound[i]
 					found_m[idx].setMap(map)
 				}
+				var total = idxOfFound.length + idxOfFinding.length
+				alert(String(total) + "개의 마커가 검색되었습니다.")
 			} else {
 				alert("검색 결과가 존재하지 않습니다.")
 			}
+			$('#search-word').val('')
 		}
 
 	</script>

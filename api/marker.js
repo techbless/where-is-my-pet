@@ -71,9 +71,10 @@ exports.insertMarker = function(req, res) {
       var comment = fields.comment
       var type = fields.type
       var f_time = fields.f_time
+      var auth = fields.auth
 
-      var sql = 'INSERT INTO markers(latitude, longitude, comment, type, f_time) VALUE(?, ?, ?, ?, ?)'
-      var params = [latitude, longitude, comment, type, f_time]
+      var sql = 'INSERT INTO markers(latitude, longitude, comment, type, f_time, auth) VALUE(?, ?, ?, ?, ?, ?)'
+      var params = [latitude, longitude, comment, type, f_time, auth]
       conn.query(sql, params, function(err, results) {
         if(err) {
           res.send({res: 'ERROR'})
@@ -144,9 +145,9 @@ exports.insertMarker = function(req, res) {
 */
 exports.deleteMarker = function(req, res) {
   const m_id = req.params.m_id
-
-  var sql = 'DELETE FROM markers WHERE m_id = ?'
-  var params = [m_id]
+  const auth = req.query.auth
+  var sql = 'DELETE FROM markers WHERE m_id = ? AND auth = ?'
+  var params = [m_id, auth]
   conn.query(sql, params, function(err, results) {
     if(err) {
       res.send({res: 'ERROR'})
