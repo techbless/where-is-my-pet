@@ -61,6 +61,7 @@
       width: 0px;
       height: 0px;
       border: 0px;
+			display: none;
     }
 	</style>
 	<script>
@@ -121,8 +122,10 @@
 	  </div>
 	</nav>
 
-
+	<!--56px-->
 	<div id="map" style="width:100%; height: calc(100% - 56px); padding: 0; margin: 0;"></div>
+
+
 
 	<!-- The Modal -->
   <div class="modal fade" id="howtouse">
@@ -142,32 +145,32 @@
 					<ul>
 					  <li>위치 및 추가정보 등록방법</li>
 					  <ol>
-					    <li>잃어버리거나 발견한 위치를 클릭하여 주세요.</li>
+					    <li><strong style="color: blue;">잃어버리거나 발견한 위치를 클릭하여 주세요.</strong></li>
 					    <li>마커 추가 창이 뜨면 사진을 선택한후 추가설명을 포함하여 모든 입력란을 채워주세요.</li>
 					    <li>달력 아이콘을 눌러 날짜와 시간을 선택할 수 있습니다.</li>
 					    <li>날짜를 선택한후 달력바로 밑 시계아이콘을 출력하여 꼭 시간도 선택해주세요.</li>
 					    <li>실종과 발견 아이콘을 서로 다릅니다. 마커 유형을 알맞게 선택해주세요.</li>
-					    <li style="color: blue;"><strong>사진 크기 및 용량이 큰경우 마커 생성에 약간의 시간이 필요합니다. 페이지를 새로고침 하거나 나가지 말아주세요.</strong></li>
+							<li>추가 버튼을 누른후, 삭제시에 이용할 비밀번호를 지정해주세요.</li>
 					  </ol>
 					</ul>
 
-					<br><h3>정보 조회</h3><br>
+					<br><h3>정보 조회</h3>
+					<img style="margin-left: 30px;" src="/img/finding.png"><img src="/img/found.png">
 					<ul>
 					  <li>등록된 정보 조회방법</li>
 					  <ol>
-					    <li>물음표(?)가 그려진 빨간색 마커는 잃어버린 위치 정보를 의미합니다.</li>
-					    <li>느낌표(!)가 그려진 초록색 마커는 발견한 위치 정보를 의미합니다.</li>
+					    <li>물음표(?)가 그려진 빨간색 마커는 <span style="color: red;">잃어버린 위치 정보</span>를 의미합니다.</li>
+					    <li>느낌표(!)가 그려진 초록색 마커는 <span style="color: green;">발견한 위치 정보</span>를 의미합니다.</li>
 					    <li>지도에 표시된 마커를 눌러 자세한 정보를 확인하실 수 있습니다.</li>
 					  </ol>
 					</ul>
 
-					<br><h3>자료 보관 기간</h3><br>
+					<br><h3>마커의 유지 기간</h3><br>
 					<ul>
 					  <li>자료 보관 기간 안내</li>
 					  <ul>
-					    <li>한번 등록된 정보는 72시간이후 매시간 주기적으로 필터링 되어 삭제 됩니다.</li>
-					    <li>따라서 모든 마커 유지 기간은 모두 다르나 약 3일 후 사진 이외에 모든 정보는 삭제됩니다.</li>
-					    <li>업로드된 사진은 원할한 서비스 및 관리를 위해여 5일간 보관된 후 삭제됩니다.</li>
+					    <li>한번 등록된 정보는 사용자가 직접 삭제하지 않는한 약 72시간 동안 유지 됩니다.</li>
+					    <li>한번 등록된 정보는 추후 빅데이터 분석을 통해 근본적인 실종사고 원인을 해결하는 등의 목적으로 보관되고 활용될 수 있습니다.</li>
 					  </ul>
 					</ul>
 
@@ -211,7 +214,7 @@
 							</div>
 
 							<label for="comment">추가 설명</label>
-	  					<textarea class="form-control" rows="5" id="comment" required></textarea>
+	  					<textarea class="form-control" rows="5" id="comment" placeholder="반려동물 상태나 특징들을 설명해주세요! 검색에 더 잘 노출 될 수 있도록 해시테그 부탁 드립니다. 예시 #포메리안 #공원 #강아지 등등" required></textarea>
 
 							<br>
 
@@ -242,8 +245,9 @@
 
 	        <!-- Modal footer -->
 	        <div class="modal-footer">
-						<input type="submit" class="btn btn-info" onclick="addNewMarker()" value="추가">
-	          <button type="button" class="btn btn-danger" data-dismiss="modal">닫기</button>
+						<p id="auto-close" style="visibility: hidden;">완료시 창이 자동으로 닫칩니다.</p>
+						<input type="submit" id="btn-add" class="btn btn-info" onclick="addNewMarker()" value="추가">
+	          <button type="button" id="btn-add-close" class="btn btn-danger" data-dismiss="modal">닫기</button>
 	        </div>
 				</form>
 
@@ -305,7 +309,7 @@
 
 	<!-- INFO MODAL -->
 	<div class="modal fade" id="infoModal">
-    <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-dialog modal-dialog-centered modal-md">
       <div class="modal-content">
 
         <!-- Modal Header -->
@@ -326,6 +330,7 @@
         <!-- Modal footer -->
         <div class="modal-footer">
 					<input type="hidden" id="m_id" value="" />
+
 					<!--<button type="button" class="btn btn-info" data-dismiss="modal" onclick="addNewMarker()">추가</button>-->
 					<button type="button" class="btn" data-dismiss="modal" onclick="deleteMarker()">삭제</button>
           <button type="button" class="btn btn-danger" data-dismiss="modal">닫기</button>
@@ -338,6 +343,8 @@
 	<!-- To use data from anywehre -->
 	<input type="hidden" id="mouseLat" value=""/>
 	<input type="hidden" id="mouseLng" value=""/>
+
+
 
 	<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=dd7cc743403ed91289c131f3f48d89be"></script>
 	<script>
@@ -526,9 +533,9 @@
 					$('#f_time').val('올바른 날짜와 시간을 입력해주세요.')
 					alert('유효한 날짜와 시간을 입력해주세요.')
 				} else {
-					var auth = prompt("삭제하실때 이용할 비밀번호를 입력해주세요.", "p@ssw0rd")
-					if(!auth) {
-						alert("유효한 비밀번호를 입력해주세요.[4자 이상]")
+					var auth = prompt("삭제하실때 이용할 비밀번호를 입력해주세요.(4글자 이상)")
+					if(auth.length < 4) {
+						alert("4글자 이상의 비밀번호를 입력해주세요.")
 					} else {
 						var input = document.querySelector('input[type="file"]')
 						var data = new FormData()
@@ -549,21 +556,39 @@
 						})
 						.then(function(data) {
 							if(data.res == 'SUCCESS') {
-								drawMarker(data)
+								var marker = drawMarker(data)
+								if(data.type == 'finding') {
+									finding.push(data)
+									finding_m.push(marker)
+								} else if(data.type == 'found') {
+									found.push(data)
+									found_m.push(marker)
+								} else {
+									alert("마커 추가를 완료하였습니다. 정상적인 검색기능 위해 새로고침 부탁드립니다.")
+								}
+
 							} else {
 								alert("마커를 추가하는 중에 문제가 발생했습니다.")
 							}
 						})
-
-						// reset all input data in Modal
-						$('#comment').val('')
-						$('#img-file').val('')
-						$('.custom-file-label').addClass("selected").html('발견한 사진을 추가해주세요')
-						$('#marker-type').val('finding')
-						$('#mouseLat').val('')
-						$('#mouseLng').val('')
-						$('#f_time').val('')
-						$('#insertModal').modal('hide')
+						.finally(function() {
+							// reset all input data in Modal
+							$('#comment').val('')
+							$('#img-file').val('')
+							$('.custom-file-label').addClass("selected").html('발견한 사진을 추가해주세요')
+							$('#marker-type').val('finding')
+							$('#mouseLat').val('')
+							$('#mouseLng').val('')
+							$('#f_time').val('')
+							$('#insertModal').modal('hide')
+							$('#btn-add').css('display','block')
+							$('#btn-add-close').css('display','block')
+							$('#auto-close').css('visibility', 'hidden')
+						})
+						$('#btn-add').css('display','none')
+						$('#btn-add-close').css('display','none')
+						$('#auto-close').css('visibility', 'visible')
+						alert("서버에 업로드중입니다. 페이지를 나가거나 새로고침 하지 마세요.")
 					}
 				}
 			}
@@ -578,13 +603,15 @@
 			var idxOfFound = []
 
 			for(var i = 0; i < finding.length; i++) {
-				if(finding[i].comment.includes(word)) {
+				//if(finding[i].comment.includes(word)) {
+				if(finding[i].comment.indexOf(word) != -1) {
 					idxOfFinding.push(i)
 				}
 			}
 
 			for(var i = 0; i < found.length; i++) {
-				if(found[i].comment.includes(word)) {
+				//if(found[i].comment.includes(word)) {
+				if(found[i].comment.indexOf(word) != -1) {
 					idxOfFound.push(i)
 				}
 			}
