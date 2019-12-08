@@ -26,21 +26,11 @@
 			width: 100%;
 			height: 100%;
 		}
-		.info-overlay {
-			background-color: white;
-			width: 330px;
-			height: 380px;
-			padding: 0px;
-			position: absolute;
-			left: -165px;
-			bottom: 50px;
-			border-radius: 10px;
-		}
-		.info-bg {
-			width: 330px;
-			height: 200px;
-			background-size: 100% 100%;
-			border-radius: 10px 10px 0px 0px;
+		#info-img {
+			display: block;
+			width: 100%;
+			height: auto;
+			max-height: 100%;
 		}
 		#info-comment {
 	    white-space: pre-wrap;       /* Since CSS 2.1 */
@@ -49,7 +39,7 @@
 	    white-space: -o-pre-wrap;    /* Opera 7 */
 	    word-wrap: break-word;       /* Internet Explorer 5.5+ */
 			overflow: auto;
-			width: 100%;
+			width: 98%;
 		}
 		pre {
 			font-size: 16px;
@@ -63,8 +53,17 @@
       border: 0px;
 			display: none;
     }
+		.loading {
+			width: 10%;
+			height: auto;
+	    position:absolute;
+	    top:50%; left:50%;
+	    transform: translate(-50%, -50%);
+			z-index: 1000;
+		}
 	</style>
 	<script>
+
 		var setCookie = function(name, value, exp) {
 			var date = new Date();
 			date.setTime(date.getTime() + exp*24*60*60*1000);
@@ -125,7 +124,7 @@
 	<!--56px-->
 	<div id="map" style="width:100%; height: calc(100% - 56px); padding: 0; margin: 0;"></div>
 
-
+	<img class="loading" src="/img/loading.gif" alt="Loading...">
 
 	<!-- The Modal -->
   <div class="modal fade" id="howtouse">
@@ -280,7 +279,7 @@
 
 					<!-- Modal Header -->
 					<div class="modal-header">
-						<h4 class="modal-title" id="info-type">검색</h4>
+						<h4 class="modal-title">검색</h4>
 						<button type="button" class="close" data-dismiss="modal">×</button>
 					</div>
 
@@ -306,43 +305,45 @@
 		</form>
 	</div>
 
-
-	<!-- INFO MODAL -->
+	<!-- INFO -->
+	<input type="hidden" id="m_id" value="" />
 	<div class="modal fade" id="infoModal">
-    <div class="modal-dialog modal-dialog-centered modal-md">
-      <div class="modal-content">
+		<form>
+			<div class="modal-dialog modal-dialog-centered">
+				<div class="modal-content">
 
-        <!-- Modal Header -->
-        <div class="modal-header">
-          <h4 class="modal-title" id="info-type">타입 정보 여기 표시</h4>
-          <button type="button" class="close" data-dismiss="modal">×</button>
-        </div>
+					<!-- Modal Header -->
+					<div class="modal-header">
+						<h4 class="modal-title" id="info-type">타입 정보 여기 표시</h4>
+						<button type="button" class="close" data-dismiss="modal">×</button>
+					</div>
 
-        <!-- Modal body -->
-        <div class="modal-body">
-					<img id="info-img" alt="사진" style="width: 100%; height: auto;">
+					<!-- Modal body -->
+					<div class="modal-body" id="info-body">
+						<div>
+							<img id="info-img" alt="사진">
+						</div>
+						<pre id="info-comment">관련 Comment가 여기에 표시됩니다.</pre>
+						<p id="info-f-time" style="font-size: 14px; position: absolute; right: 10px; bottom: -5px;">실종/발견 시간</p>
+					</div>
 
-					<pre id="info-comment">관련 Comment가 여기에 표시됩니다.</pre>
-					<p id="info-f-time" style="font-size: 14px; position: absolute; right: 10px; bottom: -5px;">실종/발견 시간</p>
-        </div>
+					<!-- Modal footer -->
+					<div class="modal-footer">
 
+						<button type="button" class="btn" data-dismiss="modal" onclick="deleteMarker()">삭제</button>
+						<button type="button" class="btn btn-danger" data-dismiss="modal">닫기</button>
+					</div>
 
-        <!-- Modal footer -->
-        <div class="modal-footer">
-					<input type="hidden" id="m_id" value="" />
-
-					<!--<button type="button" class="btn btn-info" data-dismiss="modal" onclick="addNewMarker()">추가</button>-->
-					<button type="button" class="btn" data-dismiss="modal" onclick="deleteMarker()">삭제</button>
-          <button type="button" class="btn btn-danger" data-dismiss="modal">닫기</button>
-        </div>
-
-      </div>
-    </div>
-  </div>
+				</div>
+			</div>
+		</form>
+	</div>
 
 	<!-- To use data from anywehre -->
 	<input type="hidden" id="mouseLat" value=""/>
 	<input type="hidden" id="mouseLng" value=""/>
+
+
 
 
 
@@ -369,7 +370,16 @@
 				map.setLevel(4)
       })
 		}
+		setLoading(false)
 		// End of creating a map
+
+		function setLoading(status) {
+			if(status == false) {
+				$('.loading').css('display', 'none')
+			} else {
+				$('.loading').css('display', 'block')
+			}
+		}
 
 		function deleteMarker() {
 			var m_id = $('#m_id').val()
@@ -429,6 +439,7 @@
 			kakao.maps.event.addListener(marker, 'click', function() {
 				//closeOverlays()
 				//overlay.setMap(map)
+
 				var infoTypeString = '로딩중 문제가 발생했습니다.'
 				var infoFtimeString = '로딩중 문제가 발생했습니다.'
 				var f_time = info.f_time
@@ -447,7 +458,19 @@
 				$('#info-img').attr('src', info.img_url)
 				$('#info-comment').text(info.comment)
 				$('#infoModal').modal()
-				$('#m_id').val(info.m_id)
+				$('#infoModal').css('visibility', 'hidden')
+				setLoading(true)
+				setTimeout(function() {
+					const img_height = $('#info-img').height()
+					const comment_height = $('#info-comment').height()
+					const calc = 'calc(' + img_height + 'px + ' + comment_height + 'px + 50px)'
+					console.log(calc)
+					$('#info-body').css('height', calc)
+					$('#m_id').val(info.m_id)
+					setLoading(false)
+					$('#infoModal').css('visibility', 'visible')
+				}, 1000)
+
 			})
 
 			// return marker or false when failed
