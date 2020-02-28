@@ -22,7 +22,7 @@ CREATE TABLE IF NOT EXISTS `markers` (
   `img_url` varchar(200) DEFAULT NULL,
   `auth` varchar(50) NOT NULL DEFAULT '',
   PRIMARY KEY (`m_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 -- 내보낼 데이터가 선택되어 있지 않습니다.
 
