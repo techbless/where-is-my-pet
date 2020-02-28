@@ -1,11 +1,14 @@
 var conn = require('./db')
 var aws = require('aws-sdk')
-aws.config.loadFromPath(__dirname + "/s3/config.json")
 var formidable = require('formidable')
 var fs = require('fs')
 var path = require('path')
 
-
+aws.config.update({
+  region: process.env.AWS_REGION,
+  accessKeyId: process.env.AWS_ACCESS_KEY_ID,
+  secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY
+});
 
 /* GET METHOD
   - get all markers information in database.
