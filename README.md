@@ -3,6 +3,12 @@
 It is a platform to share the recently discovered locations of missing pets.  
 최근 발견된 실종 반려동물의 위치를 공유하는 플랫폼입니다.
 
+![location selected](images/clicked.png)   
+The Screen when lost or found location clicked in the map   지도에서 발견되거나 실종된 위치를 클릭한 화면 
+
+![Detailed Info](images/info.png)
+The Screen when a marker is clicked to see details   자세한 내용을 보기이위해 마커를 클린한 화면
+
 ## Instructions
 
 
