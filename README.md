@@ -5,14 +5,14 @@ It is a platform to share the recently discovered locations of missing pets.
 
 ## Instructions
 
-### When Site URL Changed
-Change some urls in `public/index.html`
 
 ### Database Table Structure
 The Table Structure can be found at [sql/markers.sql](/sql/markers.sql).
 
 
 ### Environment Variables
+
+`SITE_URL` : Site URL
 
 `MYSQL_HOST` : Host of Mysql  
 `MYSQL_USER` : Username of Mysql  
