@@ -54,7 +54,7 @@
 			display: none;
     }
 		.loading {
-			width: 10%;
+			width: 100px;
 			height: auto;
 	    position:absolute;
 	    top:50%; left:50%;
@@ -480,7 +480,19 @@
 				$('#infoModal').modal()
 				$('#infoModal').css('visibility', 'hidden')
 				setLoading(true)
-				setTimeout(function() {
+				$('#info-img').on('load', function() {
+					setTimeout(function() {
+						const img_height = $('#info-img').height()
+						const comment_height = $('#info-comment').height()
+						const calc = 'calc(' + img_height + 'px + ' + comment_height + 'px + 50px)'
+						console.log(calc)
+						$('#info-body').css('height', calc)
+						$('#m_id').val(info.m_id)
+						setLoading(false)
+						$('#infoModal').css('visibility', 'visible')
+					}, 350)
+				})
+				/*setTimeout(function() {
 					const img_height = $('#info-img').height()
 					const comment_height = $('#info-comment').height()
 					const calc = 'calc(' + img_height + 'px + ' + comment_height + 'px + 50px)'
@@ -489,7 +501,8 @@
 					$('#m_id').val(info.m_id)
 					setLoading(false)
 					$('#infoModal').css('visibility', 'visible')
-				}, 1450)
+				}, 1450)*/
+
 
 			})
 
