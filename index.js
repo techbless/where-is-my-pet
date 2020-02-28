@@ -26,6 +26,8 @@ app.use(bodyParser.urlencoded({extended: true}))
 app.use(cors())
 app.use(express.static('public'));
 
+app.set('view engine', 'ejs');
+
 /*var corsOptions = {
   origin :'http://whereismypet.paas-ta.org'
 };*/
@@ -33,7 +35,7 @@ app.get('/marker', cors(/*corsOptions*/), marker.getMarkers)
 app.post('/marker', cors(/*corsOptions*/), marker.insertMarker)
 app.delete('/marker/:m_id', cors(/*corsOptions*/), marker.deleteMarker)
 app.get('/', function(req, res) {
-  res.send("Hello World")
+  res.render('index');
 })
 
 app.listen(80, function() {

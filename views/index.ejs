@@ -1,0 +1,704 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>라온[LAON]</title>
+    <script src=https://cdn.jsdelivr.net/npm/promise-polyfill@8.1/dist/polyfill.min.js></script>
+    <script src=https://cdn.jsdelivr.net/npm/whatwg-fetch@3.0/dist/fetch.umd.min.js></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.22.2/moment.min.js"></script>
+    <link href="https://fonts.googleapis.com/css?family=Sunflower:300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/js/tempusdominus-bootstrap-4.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="apple-touch-icon-precomposed" href="/phone.png">
+    <style>
+        * {
+            font-family: 'Sunflower', sans-serif;
+        }
+        html, body {
+            padding: 0;
+            margin: 0;
+            width: 100%;
+            height: 100%;
+        }
+        #info-img {
+            display: block;
+            width: 100%;
+            height: auto;
+            max-height: 100%;
+        }
+        #info-comment {
+            white-space: pre-wrap;       /* Since CSS 2.1 */
+            white-space: -moz-pre-wrap;  /* Mozilla, since 1999 */
+            white-space: -pre-wrap;      /* Opera 4-6 */
+            white-space: -o-pre-wrap;    /* Opera 7 */
+            word-wrap: break-word;       /* Internet Explorer 5.5+ */
+            overflow: auto;
+            width: 98%;
+        }
+        pre {
+            font-size: 16px;
+            font-family: 'Sunflower', sans-serif;
+        }
+        #if{
+            padding: 0px;
+            margin: 0px;
+            width: 0px;
+            height: 0px;
+            border: 0px;
+            display: none;
+        }
+        .loading {
+            width: 100px;
+            height: auto;
+            position:absolute;
+            top:50%; left:50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+        }
+    </style>
+    <script>
+
+      var setCookie = function(name, value, exp) {
+        var date = new Date();
+        date.setTime(date.getTime() + exp*24*60*60*1000);
+        document.cookie = name + '=' + value + ';expires=' + date.toUTCString() + ';path=/';
+      };
+      var getCookie = function(name) {
+        var value = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
+        return value? value[2] : null;
+      };
+
+      $(document).ready(function() {
+        const agree = getCookie('agree')
+        if(agree != 'true') {
+          $('#howtouse').modal({backdrop: 'static', keyboard: false})
+        }
+      })
+      function agree() {
+        //alert('clicked')
+        const checkbox = $('#agree-cb').is(':checked')
+        if(checkbox == true) {
+          setCookie('agree', "true", 7)
+          alert('실종하거나 발견한 위치를 지도에서 클릭해주세요.')
+          $('#howtouse').modal('hide')
+        } else {
+          alert('서비스를 이용하려면 모두 읽고 이해 후 체크해주세요.')
+        }
+
+      }
+    </script>
+</head>
+<body>
+<nav class="navbar navbar-expand-md bg-dark navbar-dark">
+    <a class="navbar-brand" href="#">라온[LAON]</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="collapsibleNavbar">
+        <ul class="navbar-nav">
+            <li class="nav-item">
+                <a class="nav-link" href="#" onclick="markerSwitch('finding')">실종만 표시</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" onclick="markerSwitch('found')">발견만 표시</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" onclick="markerSwitch('all')">모두 표시</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" onclick="$('#howtouse').modal()">사용 설명</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="#" onclick="$('#search-modal').modal()">검색</a>
+            </li>
+        </ul>
+    </div>
+</nav>
+
+<!--56px-->
+<div id="map" style="width:100%; height: calc(100% - 56px); padding: 0; margin: 0;"></div>
+
+<img class="loading" src="/img/loading.gif" alt="Loading...">
+
+<!-- The Modal -->
+<div class="modal fade" id="howtouse">
+    <div class="modal-dialog modal-dialog-centered modal-xl">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">사용법 및 안내</h4>
+                <!--<button type="button" class="close" data-dismiss="modal">&times;</button>-->
+            </div>
+
+            <!-- Modal body -->
+            <div class="modal-body">
+
+                <br><h3>마커 추가</h3><br>
+                <ul>
+                    <li>위치 및 추가정보 등록방법</li>
+                    <ol>
+                        <li><strong style="color: blue;">잃어버리거나 발견한 위치를 클릭하여 주세요.</strong></li>
+                        <li>마커 추가 창이 뜨면 사진을 선택한후 추가설명을 포함하여 모든 입력란을 채워주세요.</li>
+                        <li>달력 아이콘을 눌러 날짜와 시간을 선택할 수 있습니다.</li>
+                        <li>날짜를 선택한후 달력바로 밑 시계아이콘을 출력하여 꼭 시간도 선택해주세요.</li>
+                        <li>실종과 발견 아이콘을 서로 다릅니다. 마커 유형을 알맞게 선택해주세요.</li>
+                        <li>추가 버튼을 누른후, 삭제시에 이용할 비밀번호를 지정해주세요.</li>
+                    </ol>
+                </ul>
+
+                <br><h3>특정 마커의 정보 조회</h3>
+                <img style="margin-left: 55px;" src="/img/finding.png"><img src="/img/found.png">
+                <ul>
+                    <li>등록된 정보 조회방법</li>
+                    <ol>
+                        <li>물음표(?)가 그려진 빨간색 마커는 <span style="color: red;">잃어버린 위치 정보</span>를 의미합니다.</li>
+                        <li>느낌표(!)가 그려진 초록색 마커는 <span style="color: green;">발견한 위치 정보</span>를 의미합니다.</li>
+                        <li>지도에 표시된 마커를 눌러 자세한 정보를 확인하실 수 있습니다.</li>
+                    </ol>
+                </ul>
+
+                <br><h3>마커 삭제</h3><br>
+                <ul>
+                    <li>특정 마커를 삭제하는 방법</li>
+                    <ol>
+                        <li>삭제하려는 마커를 클릭해 정보조회창을 열어주세요.</li>
+                        <li>하단의 삭제 버튼을 눌러주세요.</li>
+                        <li>마커를 추가할 때 입력한 비밀번호를 입력해주세요.</li>
+                    </ol>
+                </ul>
+
+                <br><h3>마커 검색</h3><br>
+                <ul>
+                    <li>특정 마커를 검색하는 방법</li>
+                    <ol>
+                        <li>상단바의 검색을 누른 후, 검색하려는 단어를 입력하고 검색 버튼을 눌러주세요.</li>
+                        <li>검색결과를 초기화 하려면, 검색창에서 초기화를 누르거나 상단바의 모두 표시를 눌러주세요.</li>
+                        <li>지도위에 검색된 마커만 표시됩니다.</li>
+                    </ol>
+                </ul>
+
+                <br><h3>마커의 유지 기간</h3><br>
+                <ul>
+                    <li>자료 보관 기간 안내</li>
+                    <ul>
+                        <li>한번 등록된 정보는 사용자가 직접 삭제하지 않는한 약 72시간 동안 유지 됩니다.</li>
+                        <li>한번 등록된 정보는 추후 빅데이터 분석을 통해 근본적인 실종사고 원인을 해결하는 등의 목적으로 보관되고 활용될 수 있습니다.</li>
+                    </ul>
+                </ul>
+
+                <p>아래의 확인 버튼을 클릭하면 7일간 초기 화면이 표시되지 않습니다. 다시 확인하려면 상단메뉴바에서 '사용설명'을 확인해주세요.</p>
+
+            </div>
+
+            <!-- Modal footer -->
+            <div class="modal-footer">
+                <input type="checkbox" id="agree-cb">위의 내용을 모두 이해하였습니다.
+                <button type="button" class="btn btn-secondary" onclick="agree()">확인</button>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<!-- INSERT MODAL -->
+<div class="modal fade" id="insertModal">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <h4 class="modal-title">새로운 마커 추가</h4>
+                <button type="button" class="close" data-dismiss="modal">×</button>
+            </div>
+
+            <!-- Modal body -->
+            <form target="preventRedirect">
+                <div class="modal-body">
+                    <div class="form-group">
+                        <div class="custom-file mb-3">
+                            <label class="custom-file-label" for="img-file">발견한 사진을 추가해주세요</label>
+                            <input type="file"
+                                   class="custom-file-input"
+                                   id="img-file"
+                                   name="filename"
+                                   accept="image/*"
+                                   required="true" />
+                        </div>
+
+                        <label for="comment">추가 설명</label>
+                        <textarea class="form-control" rows="5" id="comment" placeholder="반려동물 상태나 특징들을 설명해주세요! 검색에 더 잘 노출 될 수 있도록 해시테그 부탁 드립니다. 예시 #포메리안 #공원 #강아지 등등" required></textarea>
+
+                        <br>
+
+                        <label for="marker-type">마커 유형</label>
+                        <select class="form-control" id="marker-type">
+                            <option value='finding' selected>제 반려동물좀 찾아주세요..</option>
+                            <option value='found'>주인을 잃어버린거 같아요.!</option>
+                        </select>
+
+                        <br>
+
+                        <label for="datetimepicker1">실종/발견 시간</label>
+                        <div class='input-group date' id='datetimepicker1' data-target-input="nearest">
+                            <input type='text'
+                                   class="form-control"
+                                   id="f_time"
+                                   inputmode="none"
+                                   placeholder="실종/발견한 날짜와 시간을 선택해주세요!"
+                                   data-target="#datetimepicker1"
+                                   readonly
+                            />
+                            <span class="input-group-append" data-target="#datetimepicker1" data-toggle="datetimepicker">
+	              	<div class="input-group-text"><span class="fa fa-calendar"></span></div>
+	              </span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <p id="auto-close" style="visibility: hidden;">완료시 창이 자동으로 닫칩니다.</p>
+                    <input type="submit" id="btn-add" class="btn btn-info" onclick="addNewMarker()" value="추가">
+                    <button type="button" id="btn-add-close" class="btn btn-danger" data-dismiss="modal">닫기</button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+<iframe id="if" name="preventRedirect"></iframe>
+<script>
+
+  $(function () {
+    $('#datetimepicker1').datetimepicker({
+      locale: 'ko',
+      format: 'YYYY-MM-DD HH:mm',
+      ignoreReadonly: true,
+      //sideBySide: true
+    });
+  });
+
+  $(".custom-file-input").on("change", function() {
+    var fileName = $(this).val().split("\\").pop()
+    $(this).siblings(".custom-file-label").addClass("selected").html(fileName)
+  })
+</script>
+
+<!-- SEARCH -->
+<div class="modal fade" id="search-modal">
+    <form>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title">검색</h4>
+                    <button type="button" class="close" data-dismiss="modal">×</button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body">
+                    <div class="form-group">
+                        <label for="search-word">검색어</label>
+                        <input type="text" class="form-control" id="search-word" autofocus>
+                    </div>
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+                    <!--<button type="button" class="btn btn-info" data-dismiss="modal" onclick="addNewMarker()">추가</button>-->
+                    <button type="button" class="btn" data-dismiss="modal" onclick="markerSwitch('all')">초기화</button>
+                    <input type="submit" class="btn btn-success" data-dismiss="modal" onclick="searchMarker()" value="검색">
+                    <!--<button type="button" class="btn btn-success" data-dismiss="modal" onclick="searchMarker()">검색</button>-->
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">닫기</button>
+                </div>
+
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- INFO -->
+<input type="hidden" id="m_id" value="" />
+<div class="modal fade" id="infoModal">
+    <form>
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+
+                <!-- Modal Header -->
+                <div class="modal-header">
+                    <h4 class="modal-title" id="info-type">타입 정보 여기 표시</h4>
+                    <button type="button" class="close" data-dismiss="modal">×</button>
+                </div>
+
+                <!-- Modal body -->
+                <div class="modal-body" id="info-body">
+                    <div>
+                        <img id="info-img" alt="사진">
+                    </div>
+                    <pre id="info-comment">관련 Comment가 여기에 표시됩니다.</pre>
+                    <p id="info-f-time" style="font-size: 14px; position: absolute; right: 10px; bottom: -5px;">실종/발견 시간</p>
+                </div>
+
+                <!-- Modal footer -->
+                <div class="modal-footer">
+
+                    <button type="button" class="btn" data-dismiss="modal" onclick="deleteMarker()">삭제</button>
+                    <button type="button" class="btn btn-danger" data-dismiss="modal">닫기</button>
+                </div>
+
+            </div>
+        </div>
+    </form>
+</div>
+
+<!-- To use data from anywehre -->
+<input type="hidden" id="mouseLat" value=""/>
+<input type="hidden" id="mouseLng" value=""/>
+
+
+
+
+
+<script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=dd7cc743403ed91289c131f3f48d89be"></script>
+<script>
+
+  // Start of creating a map
+  var options = {
+    center: new kakao.maps.LatLng(37.541272, 126.989387),
+    level: 8
+  }
+  var container = document.getElementById('map');
+  var map = new kakao.maps.Map(container, options);
+
+  if (navigator.geolocation) {
+    //Move center of the map when geolocation can get a location.
+    // GeoLocation을 이용해서 접속 위치를 얻어옵니다
+    navigator.geolocation.getCurrentPosition(function(position) {
+
+      var lat = position.coords.latitude // 위도
+      var lng = position.coords.longitude // 경도
+      var center = new kakao.maps.LatLng(lat, lng)
+      map.setCenter(center)
+      map.setLevel(4)
+    })
+  }
+  setLoading(false)
+  // End of creating a map
+
+  function setLoading(status) {
+    if(status == false) {
+      $('.loading').css('display', 'none')
+    } else {
+      $('.loading').css('display', 'block')
+    }
+  }
+
+  function deleteMarker() {
+    var m_id = $('#m_id').val()
+    var auth = prompt('등록하실때 입력한 비밀번호를 입력해주세요')
+
+    if(!auth) {
+      alert("비밀번호를 입력해주세요")
+    } else {
+      const url = 'http://<%= process.env.SITE_URL %>/marker/' + m_id + '?auth=' + auth;
+      fetch(url, {
+        method: 'DELETE'
+      })
+        .then(function(res) {
+          return res.json()
+        })
+        .then(function(status) {
+          if(status.res == 'SUCCESS') {
+            alert("성공적으로 삭제를 완료했습니다.")
+            window.location.reload()
+          } else {
+            alert("삭제중 오류가 발생했습니다. 비밀번호를 확인해주세요.")
+          }
+        })
+    }
+  }
+
+  function drawMarker(info) {
+    var findingImage = '/img/finding.png'
+    var foundImage = '/img/found.png'
+    var imageSize = new kakao.maps.Size(45, 45)
+    var imageOption = {offset: new kakao.maps.Point(22, 44)}
+    var position = new kakao.maps.LatLng(info.latitude, info.longitude)
+
+    if(info.type === 'found') {
+      var foundMarkerImage = new kakao.maps.MarkerImage(foundImage, imageSize, imageOption)
+
+      var marker = new kakao.maps.Marker({
+        map: map,
+        position: position,
+        image: foundMarkerImage
+      })
+      //return marker
+    } else if(info.type === 'finding') {
+      var findingMarkerImage = new kakao.maps.MarkerImage(findingImage, imageSize, imageOption)
+
+      var marker = new kakao.maps.Marker({
+        map: map,
+        position: position,
+        image: findingMarkerImage
+      })
+      //return marker
+    } else {
+      alert("Failed to draw a marker.")
+      //return false
+    }
+
+    kakao.maps.event.addListener(marker, 'click', function() {
+      //closeOverlays()
+      //overlay.setMap(map)
+
+      var infoTypeString = '로딩중 문제가 발생했습니다.'
+      var infoFtimeString = '로딩중 문제가 발생했습니다.'
+      var f_time = info.f_time
+      f_time = f_time.replace('T', ' ')
+      f_time = f_time.replace(':00.000Z', '')
+      if(info.type == 'finding') {
+        infoTypeString = '제 반려동물좀 찾아주세요..'
+        infoFtimeString = '실종 시간 : ' + f_time
+      } else if(info.type == 'found') {
+        infoTypeString = '주인을 잃어버린거 같아요.!'
+        infoFtimeString = '발견 시간 : ' + f_time
+      }
+
+      $('#info-f-time').text(infoFtimeString)
+      $('#info-type').text(infoTypeString)
+      $('#info-img').attr('src', info.img_url)
+      $('#info-comment').text(info.comment)
+      $('#infoModal').modal()
+      $('#infoModal').css('visibility', 'hidden')
+      setLoading(true)
+      $('#info-img').on('load', function() {
+        setTimeout(function() {
+          const img_height = $('#info-img').height()
+          const comment_height = $('#info-comment').height()
+          const calc = 'calc(' + img_height + 'px + ' + comment_height + 'px + 50px)'
+          console.log(calc)
+          $('#info-body').css('height', calc)
+          $('#m_id').val(info.m_id)
+          setLoading(false)
+          $('#infoModal').css('visibility', 'visible')
+        }, 350)
+      })
+      /*setTimeout(function() {
+          const img_height = $('#info-img').height()
+          const comment_height = $('#info-comment').height()
+          const calc = 'calc(' + img_height + 'px + ' + comment_height + 'px + 50px)'
+          console.log(calc)
+          $('#info-body').css('height', calc)
+          $('#m_id').val(info.m_id)
+          setLoading(false)
+          $('#infoModal').css('visibility', 'visible')
+      }, 1450)*/
+
+
+    })
+
+    // return marker or false when failed
+
+    return marker ? marker : false
+
+  }
+
+
+
+  // Start of loading markers from server.
+  var found = [], finding = []
+  var found_m = [], finding_m = []
+  fetch('http://<%= process.env.SITE_URL %>/marker')
+    .then(function(res) {
+      return res.json()
+    })
+    .then(function(data) {
+      finding = data.filter(function(d) {
+        return d.type == 'finding'
+      })
+
+      found = data.filter(function(d) {
+        return d.type == 'found'
+      })
+
+      for (var i = 0; i < finding.length; i++) {
+        var marker_info = finding[i]
+        finding_m.push(drawMarker(marker_info))
+      }
+
+      for (var i = 0; i < found.length; i++) {
+        var marker_info = found[i]
+        found_m.push(drawMarker(marker_info))
+      }
+    })
+
+  function markerSwitch(type) {
+    var finding_map, found_map
+    if(type == 'all') {
+      finding_map = map
+      found_map = map
+    } else if(type == 'finding') {
+      finding_map = map
+      found_map = null
+    } else if(type == 'found') {
+      finding_map = null
+      found_map = map
+    } else {
+      return
+    }
+
+    for (var i = 0; i < finding_m.length; i++) {
+      finding_m[i].setMap(finding_map)
+    }
+    for (var i = 0; i < found_m.length; i++) {
+      found_m[i].setMap(found_map)
+    }
+  }
+
+  //Event Lister when the map is clicked.
+  kakao.maps.event.addListener(map, 'click', function(mouseEvent) {
+    var latlng = mouseEvent.latLng
+    $('#mouseLat').val(latlng.getLat())
+    $('#mouseLng').val(latlng.getLng())
+    $('#insertModal').modal()
+    //drawMarker(latlng.getLat(), latlng.getLng(), 'found')
+  })
+
+
+
+  function addNewMarker() {
+    var lat = $('#mouseLat').val()
+    var lng = $('#mouseLng').val()
+    var type = $('#marker-type option:selected').val()
+    var comment = $('#comment').val()
+    var f_time = $('#f_time').val()
+
+    if(($('#img-file').val() != '') && (lat != '') && (lng != '') && (type != '') && (comment != '')) {
+      const reg = /[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]/
+      var isValidDate = reg.test(f_time)
+      if(!isValidDate) {
+        $('#f_time').val('올바른 날짜와 시간을 입력해주세요.')
+        alert('유효한 날짜와 시간을 입력해주세요.')
+      } else {
+        var auth = prompt("삭제하실때 이용할 비밀번호를 입력해주세요.(4글자 이상)")
+        if(auth.length < 4) {
+          alert("4글자 이상의 비밀번호를 입력해주세요.")
+        } else {
+          var input = document.querySelector('input[type="file"]')
+          var data = new FormData()
+          data.append('latitude', lat)
+          data.append('longitude', lng)
+          data.append('type', type)
+          data.append('comment', comment)
+          data.append('img', input.files[0])
+          data.append('f_time', f_time)
+          data.append('auth', auth)
+
+          fetch('http://<%= process.env.SITE_URL %>/marker', {
+            method: 'POST',
+            body: data
+          })
+            .then(function(res) {
+              return res.json()
+            })
+            .then(function(data) {
+              if(data.res == 'SUCCESS') {
+                var marker = drawMarker(data)
+                if(data.type == 'finding') {
+                  finding.push(data)
+                  finding_m.push(marker)
+                } else if(data.type == 'found') {
+                  found.push(data)
+                  found_m.push(marker)
+                } else {
+                  alert("마커 추가를 완료하였습니다. 정상적인 검색기능 위해 새로고침 부탁드립니다.")
+                }
+
+              } else {
+                alert("마커를 추가하는 중에 문제가 발생했습니다.")
+              }
+            })
+            .finally(function() {
+              // reset all input data in Modal
+              $('#comment').val('')
+              $('#img-file').val('')
+              $('.custom-file-label').addClass("selected").html('발견한 사진을 추가해주세요')
+              $('#marker-type').val('finding')
+              $('#mouseLat').val('')
+              $('#mouseLng').val('')
+              $('#f_time').val('')
+              $('#insertModal').modal('hide')
+              $('#btn-add').css('display','block')
+              $('#btn-add-close').css('display','block')
+              $('#auto-close').css('visibility', 'hidden')
+            })
+          $('#btn-add').css('display','none')
+          $('#btn-add-close').css('display','none')
+          $('#auto-close').css('visibility', 'visible')
+          alert("서버에 업로드중입니다. 페이지를 나가거나 새로고침 하지 마세요.")
+        }
+      }
+    }
+
+  }
+
+  function searchMarker() {
+    const word = $('#search-word').val()
+    console.log(word)
+
+    var idxOfFinding = []
+    var idxOfFound = []
+
+    for(var i = 0; i < finding.length; i++) {
+      //if(finding[i].comment.includes(word)) {
+      if(finding[i].comment.indexOf(word) != -1) {
+        idxOfFinding.push(i)
+      }
+    }
+
+    for(var i = 0; i < found.length; i++) {
+      //if(found[i].comment.includes(word)) {
+      if(found[i].comment.indexOf(word) != -1) {
+        idxOfFound.push(i)
+      }
+    }
+
+
+    if(!(idxOfFound.length == 0 && idxOfFinding.length == 0)) {
+      for (var i = 0; i < finding_m.length; i++) {
+        finding_m[i].setMap(null)
+      }
+      for (var i = 0; i < found_m.length; i++) {
+        found_m[i].setMap(null)
+      }
+
+      for (var i = 0; i < idxOfFinding.length; i++) {
+        var idx = idxOfFinding[i]
+        finding_m[idx].setMap(map)
+      }
+      for (var i = 0; i < idxOfFound.length; i++) {
+        var idx = idxOfFound[i]
+        found_m[idx].setMap(map)
+      }
+      var total = idxOfFound.length + idxOfFinding.length
+      alert(String(total) + "개의 마커가 검색되었습니다.")
+    } else {
+      alert("검색 결과가 존재하지 않습니다.")
+    }
+    $('#search-word').val('')
+  }
+
+</script>
+
+
+</body>
+</html>
