@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 var express = require('express')
 var bodyParser = require('body-parser')
 var conn = require('./db')
@@ -17,6 +19,7 @@ app.use(compression())
 app.use(bodyParser.json())
 app.use(bodyParser.urlencoded({extended: true}))
 app.use(cors())
+app.use(express.static('public'));
 
 /*var corsOptions = {
   origin :'http://whereismypet.paas-ta.org'
@@ -28,7 +31,7 @@ app.get('/', function(req, res) {
   res.send("Hello World")
 })
 
-app.listen(process.env.PORT || 3000, function() {
+app.listen(80, function() {
   console.log("Server Started" )
 })
 

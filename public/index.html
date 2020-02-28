@@ -408,7 +408,7 @@
 			if(!auth) {
 				alert("비밀번호를 입력해주세요")
 			} else {
-				const url = 'http://backendapi.paas-ta.org/marker/' + m_id + '?auth=' + auth
+				const url = 'http://room.yunbin.kr/marker/' + m_id + '?auth=' + auth;
 				fetch(url, {
 					method: 'DELETE'
 				})
@@ -517,7 +517,7 @@
 		// Start of loading markers from server.
 		var found = [], finding = []
 		var found_m = [], finding_m = []
-		fetch('http://backendapi.paas-ta.org/marker')
+		fetch('http://room.yunbin.kr/marker')
 		.then(function(res) {
 			return res.json()
 		})
@@ -603,7 +603,7 @@
 						data.append('f_time', f_time)
 						data.append('auth', auth)
 
-						fetch('http://backendapi.paas-ta.org/marker', {
+						fetch('http://room.yunbin.kr/marker', {
 						  method: 'POST',
 							body: data
 						})
