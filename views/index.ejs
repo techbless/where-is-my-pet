@@ -16,6 +16,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tempusdominus-bootstrap-4/5.0.1/css/tempusdominus-bootstrap-4.min.css" />
     <link rel="shortcut icon" href="/favicon.ico" />
     <link rel="apple-touch-icon-precomposed" href="/phone.png">
+
+    <script type="text/javascript" src="/js/cookie.js"></script>
     <style>
         * {
             font-family: 'Sunflower', sans-serif;
@@ -62,37 +64,6 @@
             z-index: 1000;
         }
     </style>
-    <script>
-
-      var setCookie = function(name, value, exp) {
-        var date = new Date();
-        date.setTime(date.getTime() + exp*24*60*60*1000);
-        document.cookie = name + '=' + value + ';expires=' + date.toUTCString() + ';path=/';
-      };
-      var getCookie = function(name) {
-        var value = document.cookie.match('(^|;) ?' + name + '=([^;]*)(;|$)');
-        return value? value[2] : null;
-      };
-
-      $(document).ready(function() {
-        const agree = getCookie('agree')
-        if(agree != 'true') {
-          $('#howtouse').modal({backdrop: 'static', keyboard: false})
-        }
-      })
-      function agree() {
-        //alert('clicked')
-        const checkbox = $('#agree-cb').is(':checked')
-        if(checkbox == true) {
-          setCookie('agree', "true", 7)
-          alert('실종하거나 발견한 위치를 지도에서 클릭해주세요.')
-          $('#howtouse').modal('hide')
-        } else {
-          alert('서비스를 이용하려면 모두 읽고 이해 후 체크해주세요.')
-        }
-
-      }
-    </script>
 </head>
 <body>
 <nav class="navbar navbar-expand-md bg-dark navbar-dark">
@@ -363,11 +334,9 @@
 <input type="hidden" id="mouseLat" value=""/>
 <input type="hidden" id="mouseLng" value=""/>
 
-
 <input type="hidden" id="site_url" value="<%= process.env.SITE_URL %>">
 <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=dd7cc743403ed91289c131f3f48d89be"></script>
 <script type="text/javascript" src="/js/markers.js"></script>
-
 
 </body>
 </html>

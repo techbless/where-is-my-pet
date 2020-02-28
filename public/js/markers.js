@@ -326,3 +326,6 @@ function searchMarker() {
   }
   $('#search-word').val('')
 }
+
+
+
