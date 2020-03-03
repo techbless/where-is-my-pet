@@ -18,7 +18,7 @@ The Screen when a marker is clicked to see details 자세한 내용을 보기위
 
 ### Environment Variables
 
-`SITE_URL` : Site URL
+`SITE_URL` : Site URL   
 
 `MYSQL_HOST` : Host of Mysql  
 `MYSQL_USER` : Username of Mysql  
