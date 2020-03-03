@@ -63,30 +63,11 @@ function drawMarker(info) {
   var position = new kakao.maps.LatLng(info.latitude, info.longitude);
 
   if (info.type === "found") {
-    var foundMarkerImage = new kakao.maps.MarkerImage(
-      foundImage,
-      imageSize,
-      imageOption
-    );
-
-    var marker = new kakao.maps.Marker({
-      map: map,
-      position: position,
-      image: foundMarkerImage
-    });
-    //return marker
+    var foundMarkerImage = new kakao.maps.MarkerImage(foundImage, imageSize, imageOption);
+    var marker = new kakao.maps.Marker({map: map, position: position,image: foundMarkerImage});
   } else if (info.type === "finding") {
-    var findingMarkerImage = new kakao.maps.MarkerImage(
-      findingImage,
-      imageSize,
-      imageOption
-    );
-
-    var marker = new kakao.maps.Marker({
-      map: map,
-      position: position,
-      image: findingMarkerImage
-    });
+    var findingMarkerImage = new kakao.maps.MarkerImage(findingImage, imageSize, imageOption);
+    var marker = new kakao.maps.Marker({map: map, position: position, image: findingMarkerImage});
   } else {
     alert("Failed to draw a marker.");
   }
@@ -116,8 +97,7 @@ function drawMarker(info) {
       setTimeout(function() {
         const img_height = $("#info-img").height();
         const comment_height = $("#info-comment").height();
-        const calc =
-          "calc(" + img_height + "px + " + comment_height + "px + 50px)";
+        const calc = "calc(" + img_height + "px + " + comment_height + "px + 50px)";
         console.log(calc);
         $("#info-body").css("height", calc);
         $("#m_id").val(info.m_id);
@@ -126,34 +106,24 @@ function drawMarker(info) {
       }, 350);
     });
   });
-
-  // return marker or false when failed
-  return marker ? marker : false;
+  return marker ? marker : false; // return marker or false when failed
 }
 
 // Start of loading markers from server.
-var found = [],
-  finding = [];
-var found_m = [],
-  finding_m = [];
+var found = [], finding = [];
+var found_m = [], finding_m = [];
 fetch("http://" + SITE_URL + "/marker")
   .then(function(res) {
     return res.json();
   })
   .then(function(data) {
-    finding = data.filter(function(d) {
-      return d.type === "finding";
-    });
-
-    found = data.filter(function(d) {
-      return d.type === "found";
-    });
+    finding = data.filter(function(d) { return d.type === "finding"; });
+    found = data.filter(function(d) { return d.type === "found"; });
 
     for (var i = 0; i < finding.length; i++) {
       var marker_info = finding[i];
       finding_m.push(drawMarker(marker_info));
     }
-
     for (var i = 0; i < found.length; i++) {
       var marker_info = found[i];
       found_m.push(drawMarker(marker_info));
@@ -189,7 +159,6 @@ kakao.maps.event.addListener(map, "click", function(mouseEvent) {
   $("#mouseLat").val(latlng.getLat());
   $("#mouseLng").val(latlng.getLng());
   $("#insertModal").modal();
-  //drawMarker(latlng.getLat(), latlng.getLng(), 'found')
 });
 
 function addNewMarker() {
@@ -199,22 +168,14 @@ function addNewMarker() {
   var comment = $("#comment").val();
   var f_time = $("#f_time").val();
 
-  if (
-    $("#img-file").val() != "" &&
-    lat != "" &&
-    lng != "" &&
-    type != "" &&
-    comment != ""
-  ) {
+  if ($("#img-file").val() != "" && lat != "" && lng != "" && type != "" && comment != "") {
     const reg = /[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1]) (2[0-3]|[01][0-9]):[0-5][0-9]/;
     var isValidDate = reg.test(f_time);
     if (!isValidDate) {
       $("#f_time").val("올바른 날짜와 시간을 입력해주세요.");
       alert("유효한 날짜와 시간을 입력해주세요.");
     } else {
-      var auth = prompt(
-        "삭제하실때 이용할 비밀번호를 입력해주세요.(4글자 이상)"
-      );
+      var auth = prompt("삭제하실때 이용할 비밀번호를 입력해주세요.(4글자 이상)");
       if (auth.length < 4) {
         alert("4글자 이상의 비밀번호를 입력해주세요.");
       } else {
@@ -228,10 +189,7 @@ function addNewMarker() {
         data.append("f_time", f_time);
         data.append("auth", auth);
 
-        fetch("http://" + SITE_URL + "/marker", {
-          method: "POST",
-          body: data
-        })
+        fetch("http://" + SITE_URL + "/marker", { method: "POST", body: data })
           .then(function(res) {
             return res.json();
           })
@@ -245,16 +203,13 @@ function addNewMarker() {
                 found.push(data);
                 found_m.push(marker);
               } else {
-                alert(
-                  "마커 추가를 완료하였습니다. 정상적인 검색기능 위해 새로고침 부탁드립니다."
-                );
+                alert("마커 추가를 완료하였습니다. 정상적인 검색기능 위해 새로고침 부탁드립니다.");
               }
             } else {
               alert("마커를 추가하는 중에 문제가 발생했습니다.");
             }
           })
           .finally(function() {
-            // reset all input data in Modal
             $("#comment").val("");
             $("#img-file").val("");
             $(".custom-file-label")
@@ -284,16 +239,13 @@ function searchMarker() {
 
   var idxOfFinding = [];
   var idxOfFound = [];
-
   for (var i = 0; i < finding.length; i++) {
-    //if(finding[i].comment.includes(word)) {
     if (finding[i].comment.indexOf(word) != -1) {
       idxOfFinding.push(i);
     }
   }
 
   for (var i = 0; i < found.length; i++) {
-    //if(found[i].comment.includes(word)) {
     if (found[i].comment.indexOf(word) != -1) {
       idxOfFound.push(i);
     }
