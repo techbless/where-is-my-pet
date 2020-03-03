@@ -23,7 +23,7 @@
     <nav class="navbar navbar-expand-md bg-dark navbar-dark">
       <a class="navbar-brand" href="#">라온[LAON]</a>
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#collapsibleNavbar">
-      <span class="navbar-toggler-icon"></span>
+        <span class="navbar-toggler-icon"></span>
       </button>
       <div class="collapse navbar-collapse" id="collapsibleNavbar">
         <ul class="navbar-nav">
@@ -35,10 +35,8 @@
         </ul>
       </div>
     </nav>
-    <!--56px-->
-    <div id="map" style="width:100%; height: calc(100% - 56px); padding: 0; margin: 0;"></div>
+    <div id="map" style="width:100%; height: calc(100% - 56px); padding: 0; margin: 0;"></div><!--56px-->
     <img class="loading" src="/img/loading.gif" alt="Loading...">
-    
     <div class="modal fade" id="howtouse">
       <div class="modal-dialog modal-dialog-centered modal-xl">
         <div class="modal-content">
@@ -118,14 +116,12 @@
                   <input type="file" class="custom-file-input" id="img-file" name="filename" accept="image/*" required="true" />
                 </div>
                 <label for="comment">추가 설명</label>
-                <textarea class="form-control" rows="5" id="comment" placeholder="반려동물 상태나 특징들을 설명해주세요! 검색에 더 잘 노출 될 수 있도록 해시테그 부탁 드립니다. 예시 #포메리안 #공원 #강아지 등등" required></textarea>
-                <br>
+                <textarea class="form-control" rows="5" id="comment" placeholder="반려동물 상태나 특징들을 설명해주세요! 검색에 더 잘 노출 될 수 있도록 해시테그 부탁 드립니다. 예시 #포메리안 #공원 #강아지 등등" required></textarea><br>
                 <label for="marker-type">마커 유형</label>
                 <select class="form-control" id="marker-type">
                   <option value='finding' selected>제 반려동물좀 찾아주세요..</option>
                   <option value='found'>주인을 잃어버린거 같아요.!</option>
-                </select>
-                <br>
+                </select><br>
                 <label for="datetimepicker1">실종/발견 시간</label>
                 <div class='input-group date' id='datetimepicker1' data-target-input="nearest">
                   <input type='text' class="form-control" id="f_time" inputmode="none" placeholder="실종/발견한 날짜와 시간을 선택해주세요!" data-target="#datetimepicker1" readonly />
@@ -143,8 +139,7 @@
           </form>
         </div>
       </div>
-    </div>
-    <iframe id="if" name="preventRedirect"></iframe>
+    </div> <iframe id="if" name="preventRedirect"></iframe>
     <script>
       $(function() {
           $('#datetimepicker1').datetimepicker({
@@ -158,8 +153,7 @@
           $(this).siblings(".custom-file-label").addClass("selected").html(fileName)
       })
     </script>
-    <!-- SEARCH -->
-    <div class="modal fade" id="search-modal">
+    <div class="modal fade" id="search-modal"><!-- SEARCH -->
       <form>
         <div class="modal-dialog modal-dialog-centered">
           <div class="modal-content">
@@ -182,8 +176,7 @@
         </div>
       </form>
     </div>
-    <!-- INFO -->
-    <input type="hidden" id="m_id" value="" />
+    <input type="hidden" id="m_id" value="" /><!-- INFO -->
     <div class="modal fade" id="infoModal">
       <form>
         <div class="modal-dialog modal-dialog-centered">
@@ -207,8 +200,7 @@
         </div>
       </form>
     </div>
-    <!-- To use data from anywehre -->
-    <input type="hidden" id="mouseLat" value="" />
+    <input type="hidden" id="mouseLat" value="" /><!-- To use data from anywehre -->
     <input type="hidden" id="mouseLng" value="" />
     <input type="hidden" id="site_url" value="<%= process.env.SITE_URL %>">
     <script type="text/javascript" src="//dapi.kakao.com/v2/maps/sdk.js?appkey=dd7cc743403ed91289c131f3f48d89be"></script>
