@@ -17,7 +17,7 @@ export class Marker extends BaseEntity {
   @Column()
   type!: string;
 
-  @Column({ type: "date" })
+  @Column({ type: "datetime" })
   f_time!: string;
 
   @Column({ nullable: true })
