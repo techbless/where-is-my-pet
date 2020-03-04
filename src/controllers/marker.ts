@@ -43,8 +43,17 @@ class MarkerController {
   }
 
   public async getMarkers(req: Request, res: Response) {
-    const markers = await MarkerModel.readAll();
-    res.json(markers);
+    try {
+      const markers = await MarkerModel.readAll();
+      res.json(markers);
+    } catch (error) {
+      res.json({
+        res: "ERROR",
+        details: "Failed to read markers from database"
+      });
+
+      throw error;
+    }
   }
 
   public async addMarker(req: Request, res: Response) {
@@ -129,19 +138,27 @@ class MarkerController {
     const m_id = +req.params.m_id; // Number
     const auth = req.query.auth;
 
-    const realAuth = await MarkerModel.getAuth(m_id);
+    try {
+      const realAuth = await MarkerModel.getAuth(m_id);
+      if (auth == realAuth && realAuth) {
+        await MarkerModel.delete(m_id, auth);
+        res.json({
+          res: "SUCCESS",
+          m_id: m_id
+        });
+      } else {
+        res.json({
+          res: "FAILED",
+          details: "Wrong password or No such marker exists"
+        });
+      }
+    } catch (error) {
+      res.json({
+        res: "ERROR",
+        details: "Failed to get password from database"
+      });
 
-    if (auth == realAuth && realAuth) {
-      await MarkerModel.delete(m_id, auth);
-      res.json({
-        res: "SUCCESS",
-        m_id: m_id
-      });
-    } else {
-      res.json({
-        res: "FAILED",
-        details: "Wrong password or No such marker exists"
-      });
+      throw error;
     }
   }
 }
