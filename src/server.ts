@@ -7,6 +7,9 @@ dotenv.config();
 // Entities
 import { Marker } from "./models/entities/marker";
 
+// Auto Marker Expiry Checker
+import { ExpiryChecker } from "./modules/expiryChecker";
+
 const options: typeorm.ConnectionOptions = {
   type: "mysql",
   host: process.env.MYSQL_HOST,
@@ -14,16 +17,21 @@ const options: typeorm.ConnectionOptions = {
   username: process.env.MYSQL_USER,
   password: process.env.MYSQL_PASSWORD,
   database: process.env.MYSQL_DATABASE,
+  entities: [Marker],
+  //entities: ["src/models/entities/**/*.ts"]
   synchronize: true,
   logging: true,
-  entities: [Marker]
-  //entities: ["src/models/entities/**/*.ts"]
+  charset: "utf8mb4"
 };
 
 typeorm.createConnection(options).then(() => {
   const PORT: number = 80;
+
   app.listen(PORT, err => {
     if (err) throw err;
     else console.log("Server Listen on Port ", PORT);
   });
+
+  const expiryChecker: ExpiryChecker = new ExpiryChecker();
+  expiryChecker.deleteFrequently();
 });
