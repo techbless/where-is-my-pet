@@ -75,6 +75,15 @@ class MarkerModel {
       auth: auth
     });
   }
+
+  public async deleteExpired() {
+    const repository = await getRepository(Marker);
+    repository
+      .createQueryBuilder()
+      .delete()
+      .where("f_time < NOW() - INTERVAL 3 DAY")
+      .execute();
+  }
 }
 
 export default new MarkerModel();
