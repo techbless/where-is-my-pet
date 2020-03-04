@@ -18,10 +18,11 @@ const options: typeorm.ConnectionOptions = {
   password: process.env.MYSQL_PASSWORD,
   database: process.env.MYSQL_DATABASE,
   entities: [Marker],
-  //entities: ["src/models/entities/**/*.ts"]
+  timezone: "+09:00",
   synchronize: true,
   logging: true,
   charset: "utf8mb4"
+  //entities: ["src/models/entities/**/*.ts"]
 };
 
 typeorm.createConnection(options).then(() => {
