@@ -4,7 +4,6 @@ import * as AWS from "aws-sdk";
 import * as formidable from "formidable";
 import * as path from "path";
 import * as fs from "fs";
-import e = require("express");
 
 interface FormData {
   fields: formidable.Fields;
@@ -45,20 +44,7 @@ class MarkerController {
 
   public async getMarkers(req: Request, res: Response) {
     const markers = await MarkerModel.readAll();
-
-    const result = markers.map(marker => {
-      return {
-        m_id: marker.marker_m_id,
-        latitude: marker.marker_latitude,
-        longitude: marker.marker_longitude,
-        comment: marker.marker_comment,
-        type: marker.marker_type,
-        f_time: marker.marker_f_time,
-        img_url: marker.marker_img_url
-      };
-    });
-
-    res.json(result);
+    res.json(markers);
   }
 
   public async addMarker(req: Request, res: Response) {
@@ -112,13 +98,16 @@ class MarkerController {
 
     try {
       const data = await this.s3.upload(params).promise();
+
       try {
         MarkerModel.updateImageUrl(insertedMarker.m_id, data.Location);
+        insertedMarker.img_url = data.Location;
       } catch (error) {
         res.json({
           res: "ERROR",
           details: "Failed to update iamage url on Database."
         });
+
         throw error;
       }
     } catch (error) {
@@ -126,11 +115,13 @@ class MarkerController {
         res: "ERROR",
         details: "Failed to upload image to s3 bucket."
       });
+
       throw error;
     }
 
     const result = JSON.parse(JSON.stringify(insertedMarker));
     result.res = "SUCCESS";
+
     res.json(result);
   }
 
