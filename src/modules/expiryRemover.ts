@@ -1,6 +1,6 @@
 import MarkerModel from "../models/marker";
 
-export class ExpiryChecker {
+export class ExpiryRemover {
   public delete = async () => {
     const result = await MarkerModel.deleteExpired();
     console.log("expired Marker deleted", result);

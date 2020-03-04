@@ -7,8 +7,8 @@ dotenv.config();
 // Entities
 import { Marker } from "./models/entities/marker";
 
-// Auto Marker Expiry Checker
-import { ExpiryChecker } from "./modules/expiryChecker";
+// Auto Marker Expiry Remover
+import { ExpiryRemover } from "./modules/expiryRemover";
 
 const options: typeorm.ConnectionOptions = {
   type: "mysql",
@@ -33,6 +33,6 @@ typeorm.createConnection(options).then(() => {
     else console.log("Server Listen on Port ", PORT);
   });
 
-  const expiryChecker: ExpiryChecker = new ExpiryChecker();
-  expiryChecker.deleteFrequently();
+  const expiryRemover: ExpiryRemover = new ExpiryRemover();
+  expiryRemover.deleteFrequently();
 });
