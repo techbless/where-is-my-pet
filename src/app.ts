@@ -9,11 +9,12 @@ class App {
   constructor() {
     this.app = express();
 
-    this.app.use(express.static("public"));
+    this.app.use(express.static(__dirname + "/public"));
+    this.app.set("view engine", "ejs");
+    this.app.set("views", __dirname + "/views");
+
     this.app.use(express.json());
     this.app.use(express.urlencoded({ extended: false }));
-
-    this.app.set("view engine", "ejs");
 
     this.app.use("/", IndexRouter);
     this.app.use("/marker", MarkerRouter);
