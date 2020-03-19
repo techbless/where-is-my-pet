@@ -8,7 +8,6 @@ import app from "../app";
 import connectDB from "../modules/dbc";
 
 import { Marker } from "../models/entities/marker";
-import { doesNotMatch } from "assert";
 
 describe("App Test", () => {
   const req = request(app);
