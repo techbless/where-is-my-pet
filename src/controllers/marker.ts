@@ -136,7 +136,7 @@ class MarkerController {
 
   public async deleteMarker(req: Request, res: Response) {
     const m_id = +req.params.m_id; // Number
-    const auth = req.query.auth;
+    const auth = req.query.auth as string;
 
     try {
       const realAuth = await MarkerModel.getAuth(m_id);
