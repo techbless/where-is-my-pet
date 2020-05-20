@@ -35,7 +35,7 @@ function deleteMarker() {
   if (!auth) {
     alert("비밀번호를 입력해주세요");
   } else {
-    const url = "http://" + SITE_URL + "/marker/" + m_id + "?auth=" + auth;
+    const url = "https://" + SITE_URL + "/marker/" + m_id + "?auth=" + auth;
     fetch(url, {
       method: "DELETE"
     })
@@ -129,7 +129,7 @@ var found = [],
   finding = [];
 var found_m = [],
   finding_m = [];
-fetch("http://" + SITE_URL + "/marker")
+fetch("https://" + SITE_URL + "/marker")
   .then(function(res) {
     return res.json();
   })
@@ -218,7 +218,7 @@ function addNewMarker() {
         data.append("f_time", f_time);
         data.append("auth", auth);
 
-        fetch("http://" + SITE_URL + "/marker", { method: "POST", body: data })
+        fetch("https://" + SITE_URL + "/marker", { method: "POST", body: data })
           .then(function(res) {
             return res.json();
           })
