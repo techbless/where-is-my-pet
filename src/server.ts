@@ -9,7 +9,7 @@ import app from "./app";
 // Auto Marker Expiry Remover
 import { ExpiryRemover } from "./modules/expiryRemover";
 
-const PORT: number = 80;
+const PORT: number = +process.env.PORT!;
 
 connectDB().then(() => {
   app.listen(PORT, err => {
